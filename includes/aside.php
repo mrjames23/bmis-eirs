@@ -14,19 +14,19 @@
         with font-awesome or any other icon font library -->
                 <li class="nav-header">MENU</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="main_page.php" class="nav-link">
                         <i class="fa fa-info nav-icon"></i>
-                        <p>Baranggay Information</p>
+                        <p>Barangay Information</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="announcements.php" class="nav-link">
                         <i class="fa fa-bullhorn nav-icon"></i>
                         <p>Announcements</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="user_profiles.php" class="nav-link">
                         <i class="nav-icon fa fa-user"></i>
                         <p>
                             User Profiles
@@ -60,7 +60,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-list-ul"></i>
+                        <i class="nav-icon fas fa-edit"></i>
                         <p>
                             Reservations
                         </p>
@@ -69,7 +69,7 @@
 
                 <li class="nav-header">ADMIN</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="user_accounts.php" class="nav-link">
                         <i class="nav-icon fa fa-user"></i>
                         <p>
                             User Accounts
@@ -85,7 +85,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="logout.php" class="nav-link">
                         <i class="nav-icon fa fa-sign-out-alt"></i>
                         <p>
                             Logout

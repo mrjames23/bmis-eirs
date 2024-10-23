@@ -17,6 +17,29 @@
     <link rel="stylesheet" href="../assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="../assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="../assets/plugins/sweetalert2/sweetalert2.min.css">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="../assets/plugins/toastr/toastr.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="../assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="../assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="../assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../assets/dist/css/adminlte.min.css">
+
+    <style>
+        /* css input type number: remove button */
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type=checkbox] {
+            cursor: pointer;
+        }
+
+        .custom-control-label {
+            cursor: pointer;
+        }
+    </style>
 </head>

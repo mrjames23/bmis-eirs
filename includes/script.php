@@ -12,9 +12,6 @@
 <script src="../assets/plugins/chart.js/Chart.min.js"></script>
 <!-- Sparkline -->
 <script src="../assets/plugins/sparklines/sparkline.js"></script>
-<!-- JQVMap -->
-<script src="../assets/plugins/jqvmap/jquery.vmap.min.js"></script>
-<script src="../assets/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
 <!-- jQuery Knob Chart -->
 <script src="../assets/plugins/jquery-knob/jquery.knob.min.js"></script>
 <!-- daterangepicker -->
@@ -28,7 +25,66 @@
 <script src="../assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 <!-- AdminLTE App -->
 <script src="../assets/dist/js/adminlte.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="../assets/dist/js/demo.js"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="../assets/dist/js/pages/dashboard.js"></script>
+<!-- SweetAlert2 -->
+<script src="../assets/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- Toastr -->
+<script src="../assets/plugins/toastr/toastr.min.js"></script>
+<!-- Data Tables -->
+<script src="../assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="../assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+
+<!-- Active Script -->
+<script>
+    $(function() {
+        // for data-tooltip
+        $('[data-toggle="tooltip"]').tooltip();
+        // Data Table Initialize
+        $('#table').DataTable({
+            'paging': true,
+            'responsive': true,
+            'lengthChange': true,
+            'searching': true,
+            'ordering': false,
+            'info': true,
+            'autoWidth': false,
+            'scrollX': true,
+        })
+        // Toast Fire
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
+        function error() {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Something went wrong!',
+                icon: 'error',
+                confirmButtonText: 'Exit'
+            })
+        }
+
+        function loading() {
+            Swal.fire({
+                title: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                }
+            })
+        }
+    })
+</script>
+<script>
+    $(window).on('load', function() {
+        $('.preloader').addClass('fade-out')
+
+        /** Add Active class and stay opened on selected aside */
+        var url = window.location;
+        $('li.nav-item a').filter(function() {
+            return this.href == url;
+        }).parentsUntil(".nav-item > .nav-link").addClass('menu-open');
+    })
+</script>

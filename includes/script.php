@@ -1,39 +1,51 @@
 <!-- jQuery -->
-<script src="../assets/plugins/jquery/jquery.min.js"></script>
+<script src="<?= ASSETS ?>/plugins/jquery/jquery.min.js"></script>
 <!-- jQuery UI 1.11.4 -->
-<script src="../assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="<?= ASSETS ?>/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="<?= ASSETS ?>/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="<?= ASSETS ?>/dist/js/adminlte.js"></script>
+<!-- ChartJS -->
+<script src="<?= ASSETS ?>/plugins/chart.js/Chart.min.js"></script>
+<!-- Sparkline -->
+<script src="<?= ASSETS ?>/plugins/sparklines/sparkline.js"></script>
+<!-- jQuery Knob Chart -->
+<script src="<?= ASSETS ?>/plugins/jquery-knob/jquery.knob.min.js"></script>
+<!-- daterangepicker -->
+<script src="<?= ASSETS ?>/plugins/moment/moment.min.js"></script>
+<script src="<?= ASSETS ?>/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="<?= ASSETS ?>/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Summernote -->
+<script src="<?= ASSETS ?>/plugins/summernote/summernote-bs4.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="<?= ASSETS ?>/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="<?= ASSETS ?>/plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- Toastr -->
+<script src="<?= ASSETS ?>/plugins/toastr/toastr.min.js"></script>
+<!-- Data Tables -->
+<script src="<?= ASSETS ?>/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?= ASSETS ?>/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="<?= ASSETS ?>/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $(window).on('load', function() {
+        $('.preloader').addClass('fade-out')
+
+        /** Add Active class and stay opened on selected aside */
+        var url = window.location;
+        $('li.nav-item a').filter(function() {
+            return this.href == url;
+        }).parentsUntil(".nav-item > .nav-link").addClass('menu-open');
+    })
+</script>
+<!-- Active Script -->
 <script>
     $.widget.bridge('uibutton', $.ui.button)
 </script>
-<!-- Bootstrap 4 -->
-<script src="../assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- ChartJS -->
-<script src="../assets/plugins/chart.js/Chart.min.js"></script>
-<!-- Sparkline -->
-<script src="../assets/plugins/sparklines/sparkline.js"></script>
-<!-- jQuery Knob Chart -->
-<script src="../assets/plugins/jquery-knob/jquery.knob.min.js"></script>
-<!-- daterangepicker -->
-<script src="../assets/plugins/moment/moment.min.js"></script>
-<script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
-<!-- Tempusdominus Bootstrap 4 -->
-<script src="../assets/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-<!-- Summernote -->
-<script src="../assets/plugins/summernote/summernote-bs4.min.js"></script>
-<!-- overlayScrollbars -->
-<script src="../assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-<!-- AdminLTE App -->
-<script src="../assets/dist/js/adminlte.js"></script>
-<!-- SweetAlert2 -->
-<script src="../assets/plugins/sweetalert2/sweetalert2.min.js"></script>
-<!-- Toastr -->
-<script src="../assets/plugins/toastr/toastr.min.js"></script>
-<!-- Data Tables -->
-<script src="../assets/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-
-<!-- Active Script -->
 <script>
     $(function() {
         // for data-tooltip
@@ -75,16 +87,5 @@
                 }
             })
         }
-    })
-</script>
-<script>
-    $(window).on('load', function() {
-        $('.preloader').addClass('fade-out')
-
-        /** Add Active class and stay opened on selected aside */
-        var url = window.location;
-        $('li.nav-item a').filter(function() {
-            return this.href == url;
-        }).parentsUntil(".nav-item > .nav-link").addClass('menu-open');
     })
 </script>

@@ -1,3 +1,5 @@
+<?php include_once('./database.php') ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,6 +16,8 @@
     <link rel="stylesheet" href="./assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="./assets/dist/css/adminlte.min.css">
+    <!-- jQuery -->
+    <script src="./assets/plugins/jquery/jquery.min.js"></script>
 </head>
 
 <body class="hold-transition login-page">
@@ -30,7 +34,7 @@
                 <h4 class="login-box-msg"><b>BMIS-EIRS</b></h4>
                 <p class="login-box-msg">Login Account</p>
 
-                <form action="./admin/mainpage.php" method="post">
+                <form action="./admin/" method="post">
                     <div class="input-group mb-3">
                         <input type="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
@@ -60,9 +64,6 @@
             <!-- /.login-card-body -->
         </div>
     </div>
-    <!-- /.login-box -->
-    <!-- jQuery -->
-    <script src="./assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="./assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->

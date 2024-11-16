@@ -17,7 +17,7 @@ $page = 'User Profiles';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">User Profiles</h1>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal_create_user">
+                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                 <i class="fa fa-plus"></i> ADD RECORD
                             </button>
                         </div>
@@ -91,6 +91,7 @@ $page = 'User Profiles';
         </div>
         <?php include_once('../includes/footer.php') ?>
     </div>
+    <?php include_once('./modal/user_profiles.php') ?>
     <?php include_once('../includes/script.php') ?>
 
     <script>

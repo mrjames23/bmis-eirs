@@ -17,8 +17,8 @@ $page = 'Announcements';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">Announcements</h1>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal_create_user">
-                                <i class="fa fa-plus"></i> CREATE ANNOUNCEMENT
+                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
+                                <i class="fa fa-plus"></i> CREATE
                             </button>
                         </div>
                     </div>
@@ -37,7 +37,7 @@ $page = 'Announcements';
                                     <div class="card-body pt-0">
                                         <div class="row">
                                             <div class="col-5 text-center">
-                                                <img src="../images/brgylogo.png" alt="user-avatar" class="img-square img-fluid">
+                                                <img src="../images/logo.png" alt="user-avatar" class="img-square img-fluid">
                                             </div>
                                             <div class="col-7">
                                                 <h2 class="lead"><b>News Title</b></h2>
@@ -61,7 +61,7 @@ $page = 'Announcements';
                                     <div class="card-body pt-0">
                                         <div class="row">
                                             <div class="col-5 text-center">
-                                                <img src="../images/brgylogo.png" alt="user-avatar" class="img-square img-fluid">
+                                                <img src="../images/logo.png" alt="user-avatar" class="img-square img-fluid">
                                             </div>
                                             <div class="col-7">
                                                 <h2 class="lead"><b>News Title</b></h2>
@@ -85,7 +85,7 @@ $page = 'Announcements';
                                     <div class="card-body pt-0">
                                         <div class="row">
                                             <div class="col-5 text-center">
-                                                <img src="../images/brgylogo.png" alt="user-avatar" class="img-square img-fluid">
+                                                <img src="../images/logo.png" alt="user-avatar" class="img-square img-fluid">
                                             </div>
                                             <div class="col-7">
                                                 <h2 class="lead"><b>News Title</b></h2>
@@ -109,7 +109,7 @@ $page = 'Announcements';
                                     <div class="card-body pt-0">
                                         <div class="row">
                                             <div class="col-5 text-center">
-                                                <img src="../images/brgylogo.png" alt="user-avatar" class="img-square img-fluid">
+                                                <img src="../images/logo.png" alt="user-avatar" class="img-square img-fluid">
                                             </div>
                                             <div class="col-7">
                                                 <h2 class="lead"><b>News Title</b></h2>
@@ -133,5 +133,24 @@ $page = 'Announcements';
         </div>
         <?php include_once('../includes/footer.php') ?>
     </div>
-
+    <?php include_once('./modal/announcements.php') ?>
     <?php include_once('../includes/script.php') ?>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.img-content')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $('.img-content')
+                    .attr('src', '../images/avatar.png');
+            }
+        }
+
+        $(document).ready(function() {
+
+        })
+    </script>

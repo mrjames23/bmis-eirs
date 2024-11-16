@@ -17,7 +17,7 @@ $page = 'User Accounts';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">User Accounts</h1>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal_create_user">
+                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                 <i class="fa fa-plus"></i> ADD USER
                             </button>
                         </div>
@@ -71,7 +71,7 @@ $page = 'User Accounts';
                                                 <td>2024-10-23</td>
                                                 <td>
                                                     <div class="custom-control custom-switch custom-switch-off-default custom-switch-on-success">
-                                                        <input type="checkbox" class="custom-control-input" id="" checked >
+                                                        <input type="checkbox" class="custom-control-input" id="" checked>
                                                         <label class="custom-control-label" for="">ACTIVE</label>
                                                     </div>
                                                 </td>
@@ -80,7 +80,7 @@ $page = 'User Accounts';
                                                     <button type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i>&nbsp;Delete</button>
                                                 </td>
                                             </tr>
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -96,18 +96,23 @@ $page = 'User Accounts';
         </div>
         <?php include_once('../includes/footer.php') ?>
     </div>
+    <?php include_once('./modal/user_accounts.php') ?>
     <?php include_once('../includes/script.php') ?>
 
     <script>
         $(document).ready(function() {
-            $(' #dataTable').DataTable({ "responsive" : false, "autoWidth" : false, 'ordering' : false, "scrollX" : true,
-                                                            // "ajax" : {
-                                                            // type: 'post' ,
-                                                            // url: 'ajax' ,
-                                                            // data: {
-                                                            // table: ''
-                                                            // },
-                                                            // }
-                                                            });
-                                                            })
-                                                            </script>
+            $(' #dataTable').DataTable({
+                "responsive": false,
+                "autoWidth": false,
+                'ordering': false,
+                "scrollX": true,
+                // "ajax" : {
+                // type: 'post' ,
+                // url: 'ajax' ,
+                // data: {
+                // table: ''
+                // },
+                // }
+            });
+        })
+    </script>

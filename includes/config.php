@@ -4,8 +4,8 @@
     define('SITE_TITLE', 'BMIS-EIRS');
     define('ASSETS', '../assets');
 
-    $localServer = ['localhost/'];
-
+    $localServer = ['localhost/'];        
+    
     if(in_array(SERVER_NAME, $localServer)){
         define('DB_HOST', 'localhost');
         define('DB_USER', 'root');

@@ -30,7 +30,7 @@
                 <h4 class="login-box-msg"><b>BMIS-EIRS</b></h4>
                 <p class="login-box-msg">Login Account</p>
 
-                <form action="./admin/" method="post">
+                <form id="form_login" method="post">
                     <div class="input-group mb-3">
                         <input type="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">

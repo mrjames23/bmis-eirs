@@ -1,6 +1,6 @@
 <?php
-include_once('session.php');
 $page = 'User Profiles';
+include_once('session.php');
 ?>
 
 <?php include_once('../includes/head.php') ?>

@@ -33,7 +33,7 @@
                         <a href="certificates.php" class="nav-link">
                             <i class="nav-icon fas fa-certificate"></i>
                             <p>
-                                CERTIFICATES
+                                Certificates
                             </p>
                         </a>
                     </li>
@@ -41,11 +41,11 @@
                         <a href="barangay_id.php" class="nav-link">
                             <i class="nav-icon fas fa-id-card"></i>
                             <p>
-                                BARANGAY ID
+                                Barangay ID
                             </p>
                         </a>
                     </li>
-                    <!-- <li class="nav-header">EQUIPMENT RESERVATIONS</li>
+                    <li class="nav-header">EQUIPMENT RESERVATIONS</li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fa fa-tachometer-alt"></i>
@@ -69,8 +69,31 @@
                                 Reservations
                             </p>
                         </a>
-                    </li> -->
+                    </li>
                     <li class="nav-header">ADMIN TOOLS</li>
+                    <li class="nav-item">
+                        <a href="officials.php" class="nav-link">
+                            <i class="nav-icon fa fa-users"></i>
+                            <p>
+                                Officials
+                                <!-- <i class="fas fa-angle-left right"></i> -->
+                            </p>
+                        </a>
+                        <!-- <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="officials.php" class="nav-link">
+                                    <i class="nav-icon far fa-circle"></i>
+                                    <p>Members</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="positions.php" class="nav-link">
+                                    <i class="nav-icon far fa-circle"></i>
+                                    <p>Positions</p>
+                                </a>
+                            </li>
+                        </ul> -->
+                    </li>
                     <li class="nav-item">
                         <a href="user_accounts.php" class="nav-link">
                             <i class="nav-icon fa fa-user"></i>
@@ -135,7 +158,7 @@
                         <a href="certificates.php" class="nav-link">
                             <i class="nav-icon fas fa-certificate"></i>
                             <p>
-                                CERTIFICATES
+                                Certificates
                             </p>
                         </a>
                     </li>
@@ -143,7 +166,7 @@
                         <a href="barangay_id.php" class="nav-link">
                             <i class="nav-icon fas fa-id-card"></i>
                             <p>
-                                BARANGAY ID
+                                Barabgay ID
                             </p>
                         </a>
                     </li>
@@ -172,6 +195,15 @@
                             </p>
                         </a>
                     </li> -->
+                    <li class="nav-header">OTHERS</li>
+                    <li class="nav-item">
+                        <a href="officials.php" class="nav-link">
+                            <i class="nav-icon fa fa-users"></i>
+                            <p>
+                                Officials
+                            </p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="logout.php" class="nav-link">
                             <i class="nav-icon fa fa-sign-out-alt"></i>
@@ -212,7 +244,7 @@
                         <a href="certificates.php" class="nav-link">
                             <i class="nav-icon fas fa-certificate"></i>
                             <p>
-                                CERTIFICATES
+                                Certificates
                             </p>
                         </a>
                     </li>
@@ -220,7 +252,7 @@
                         <a href="barangay_id.php" class="nav-link">
                             <i class="nav-icon fas fa-id-card"></i>
                             <p>
-                                BARANGAY ID
+                                Barangay ID
                             </p>
                         </a>
                     </li>
@@ -248,7 +280,16 @@
                                 Reservations
                             </p>
                         </a>
-                    </li> -->                    
+                    </li> -->
+                    <li class="nav-header">OTHERS</li>
+                    <li class="nav-item">
+                        <a href="officials.php" class="nav-link">
+                            <i class="nav-icon fa fa-users"></i>
+                            <p>
+                                Officials
+                            </p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="logout.php" class="nav-link">
                             <i class="nav-icon fa fa-sign-out-alt"></i>

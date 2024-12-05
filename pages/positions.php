@@ -1,5 +1,5 @@
 <?php
-$page = 'User Accounts';
+$page = 'Officials';
 include_once('session.php');
 ?>
 
@@ -16,9 +16,9 @@ include_once('session.php');
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h1 class="card-title">User Accounts</h1>
+                            <h1 class="card-title">Officials</h1>
                             <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                <i class="fa fa-plus"></i> ADD USER
+                                <i class="fa fa-plus"></i> ADD MEMBER
                             </button>
                         </div>
                     </div>
@@ -57,7 +57,7 @@ include_once('session.php');
         </div>
         <?php include_once('../includes/footer.php') ?>
     </div>
-    <?php include_once('./modal/user_accounts.php') ?>
+    <?php include_once('./modal/officials.php') ?>
     <?php include_once('../includes/script.php') ?>
     <script>
         $(function() {

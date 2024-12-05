@@ -1,6 +1,6 @@
 <?php
-include_once('session.php');
 $page = 'Baranggay Information';
+include_once('session.php');
 
 $sql = "SELECT * FROM brgy_info ORDER BY id DESC LIMIT 1";
 $result = $conn->query($sql);
@@ -80,9 +80,11 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title text-white">Barangay Information</h1>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                <i class="fa fa-edit"></i> EDIT
-                            </button>
+                            <?php if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){?>
+                                <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
+                                    <i class="fa fa-edit"></i> EDIT
+                                </button>
+                            <?php }?>
                         </div>
                     </div>
                 </div>

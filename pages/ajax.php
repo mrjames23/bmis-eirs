@@ -149,15 +149,27 @@ if(isset($_POST['table'])){
                     $action = $delete;
                     break;
             }
+            // Define action buttons via user type
+            switch ($user['user_type']) {
+                case 'ADMIN':
+                    $action = $delete;
+                    break;
+                case 'STAFF':
+                    $action = $delete;
+                    break;                
+                default:
+                    $action = '';
+                    break;
+            }
 
             $sub_array = array();
             $sub_array[] = $count++ . '.';
+            $sub_array[] = $status;
             $sub_array[] = $row['created_at'];
             $sub_array[] = $row['fullname'];
             $sub_array[] = $row['cert_type'];
             $sub_array[] = $row['cert_purpose'];
-            $sub_array[] = $status;
-            $sub_array[] = $delete;
+            $sub_array[] = $action;
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
@@ -190,6 +202,18 @@ if(isset($_POST['table'])){
                     $action = $delete;
                     break;
             }
+            // Define action buttons via user type
+            switch ($user['user_type']) {
+                case 'ADMIN':
+                    $action = $delete;
+                    break;
+                case 'STAFF':
+                    $action = $delete;
+                    break;
+                default:
+                    $action = '';
+                    break;
+            }
 
             if($row['province']){
                 $sql = "SELECT provDesc FROM refprovince WHERE provCode = ".$row['province'];
@@ -209,7 +233,6 @@ if(isset($_POST['table'])){
                 $address = $result->fetch(PDO::FETCH_ASSOC);
                 $brgy = $address['brgyDesc'];
             }
-
             $address = $row['street'].', '. $brgy.' '.$city.', '.$province;
 
             $sub_array = array();
@@ -225,7 +248,69 @@ if(isset($_POST['table'])){
             $sub_array[] = $row['emergency_relationship'];
             $sub_array[] = $row['emergency_address'];
             $sub_array[] = $row['emergency_contact'];
-            $sub_array[] = $delete;
+            $sub_array[] = $action;
+            $data[] = $sub_array;
+        }
+        $response = array('data' => $data ?? '');
+    }
+    if ($_POST['table'] == 'officials') {
+        $sql = "SELECT *, officials.id AS o_id FROM officials LEFT JOIN positions ON positions.id = officials.position_id ORDER BY level_priority ASC";
+        $result = $conn->query($sql);
+        $count = 1;
+        foreach ($result as $row) {
+            // Action Buttons
+            $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['o_id'] . '"  data-id="' . $row['fullname'] . '">
+                        <i class="fa fa-edit"></i>&nbsp;Edit
+                    </button>&nbsp;';
+            $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['o_id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>&nbsp;';
+            $view = "";
+
+            // define action buttons via user type
+            if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){
+                $action = $edit.$delete;
+            }else{
+                $action = '';
+            }
+
+            $sub_array = array();
+            $sub_array[] = $count++ . '.';
+            $sub_array[] = $row['position_name'];
+            $sub_array[] = $row['fullname'];
+            $sub_array[] = $action;
+            $data[] = $sub_array;
+        }
+        $response = array('data' => $data ?? '');
+    }
+    if ($_POST['table'] == 'positions') {
+        $sql = "SELECT * FROM positions ORDER BY level_priority ASC";
+        $result = $conn->query($sql);
+        $count = 1;
+        foreach ($result as $row) {
+            // Action Buttons
+            $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['id'] . '"  data-id="' . $row['position_name'] . '">
+                        <i class="fa fa-edit"></i>&nbsp;Edit
+                    </button>&nbsp;';
+            $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['position_name']  . '">
+                        <i class="fa fa-trash"></i>&nbsp;Delete
+                    </button>&nbsp;';
+            $view = "";
+
+            // define action buttons via user type
+            if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'
+            ) {
+                $action = $edit . $delete;
+            } else {
+                $action = '';
+            }
+
+            $sub_array = array();
+            $sub_array[] = $count++ . '.';
+            $sub_array[] = $row['position_name'];
+            $sub_array[] = $row['level_priority'];
+            $sub_array[] = $row['max_count'];
+            $sub_array[] = $action;
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
@@ -705,139 +790,7 @@ if(isset($_POST['action'])){
             'list_brgy' => $brgy,
         );
     }
-/** USER ACCOUNTS */
-    if($_POST['action'] == 'create_account'){
 
-        $arr_data = array(
-            'email'             => addslashes($_POST['lname']),
-            'pass'              => password_hash(addslashes($_POST['pass']), PASSWORD_BCRYPT),
-            'activation_code'   => '',
-            'is_active'         => 0,
-            'user_status'       => 'new registered',
-            'user_type'         => $_POST['user_type'],
-        );
-
-        $columns = implode(",", array_keys($arr_data));
-        $values = implode("','", array_values($arr_data));
-
-        $sql = "INSERT INTO users ($columns) VALUES ('$values')";
-        $result = $conn->query($sql);
-        if (isset($result) == true) {
-            $response = array(
-                'status' => 'ok',
-                'title' => 'Success!',
-                'html' => 'Account has been added!',
-                'icon' => 'success',
-            );
-        } else {
-            $response = array(
-                'status' => 'error',
-                'title' => 'Error!',
-                'html' => 'Please try again later!',
-                'icon' => 'error',
-            );
-        }  
-    }
-    if($_POST['action'] == 'edit_account'){
-        $id = $_POST['id'];
-        $arr_data = array(
-            'email'             => addslashes($_POST['lname']),
-            'pass'              => $_POST['pass'],
-            'activation_code'   => '',
-            'is_active'         => 0,
-            'user_status'       => 'account edited',
-            'user_type'         => $_POST['user_type'],
-        );
-
-        $cv = 0;
-        $setValues = '';
-        foreach ($arr_data as $index => $arr_data) {
-            $comma = ($cv > 0) ? ', ' : '';
-            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
-            $cv++;
-        }
-
-        $sql = "UPDATE user_profile SET " . $setValues . " WHERE id = $id";
-        $result = $conn->query($sql);
-        if (isset($result) == true) {
-            $response = array(
-                'status' => 'ok',
-                'title' => 'Success!',
-                'html' => 'Account has been updated!',
-                'icon' => 'success',
-            );
-        } else {
-            $response = array(
-                'status' => 'error',
-                'title' => 'Error!',
-                'html' => 'Please try again later!',
-                'icon' => 'error',
-            );
-        }
-    }
-    if($_POST['action'] == 'delete_account'){
-        $id = $_POST['id'];
-        $sql = "DELETE from users WHERE id = $id";
-        $result = $conn->query($sql);
-        if($result){
-            $response = array(
-                'title' => 'Deleted!',
-                'html' => 'Account has been deleted.',
-                'icon' => 'success',
-            );
-        }else{
-            $response = array(
-                'title' => 'Failed!',
-                'html' => 'Failed to delete data.',
-                'icon' => 'error',
-            );                
-        }        
-    }
-    if($_POST['action'] == 'fetch_account'){
-        $id = $_POST['id'];
-        $sql = "SELECT * FROM users WHERE id = $id";
-        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
-        $response = array(
-            'id'                => $row['id'],
-            'email'             => $row['email'],
-            'pass'              => $row['pass'],
-            'user_type'         => $row['user_type'],
-        );
-    }
-    if($_POST['action'] == 'change_account_status'){
-        $id = $_POST['id'];
-        $is_active = $_POST['switchValue'];
-        
-        switch ($is_active) {
-            case 'true':
-                $title = 'Status On';
-                $html = 'Status turned ON';
-                break;
-            
-            default:
-                $title = 'Status Off';
-                $html = 'Status turned OFF';
-                break;
-        }
-
-        $sql = "UPDATE users
-                SET is_active = $is_active
-                WHERE id = $id";
-        $result = $conn->query($sql);
-        if($result){
-            $response = array(
-                'title' => $title,
-                'html' => $html,
-                'icon' => 'success',
-                );
-        }else{
-            $response = array(
-                'title' => 'Failed!',
-                'html' => 'failed to change publish status.',
-                'icon' => 'error',
-            );
-        }
-    }
 /** CERTIFICATES */
     if ($_POST['action'] == 'create_request_certificate') {
 
@@ -1161,6 +1114,369 @@ if(isset($_POST['action'])){
             'list_brgy' => $brgy,
         );
     }
+/** OFFICIALS */
+    if ($_POST['action'] == 'create_official') {
+
+        $sql = "SELECT positions.max_count, COUNT(officials.id) AS count_officials
+                FROM positions
+                LEFT JOIN officials ON officials.position_id = positions.id
+                WHERE positions.id= ". $_POST['position_id'];
+        $result = $conn->query($sql);
+        $count = $result->fetch(PDO::FETCH_ASSOC);
+        if($count['count_officials'] < $count['max_count']){
+            
+            $arr_data = array(
+                'fullname'      => addslashes($_POST['fullname']),
+                'position_id'   => $_POST['position_id'],
+            );
+
+            $columns = implode(",", array_keys($arr_data));
+            $values = implode("','", array_values($arr_data));
+
+            $sql = "INSERT INTO officials ($columns) VALUES ('$values')";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'Data has been added!',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
+
+        }else{
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'New Official cannot be added. Position members is already full.',
+                'icon' => 'warning',
+            );
+        }
+
+
+    }
+    if ($_POST['action'] == 'create_position') {
+
+        $arr_data = array(
+            'position_name'     => addslashes($_POST['position_name']),
+            'max_count'         => $_POST['max_count'],
+            'level_priority'    => $_POST['level_priority'],
+        );
+
+        $columns = implode(",", array_keys($arr_data));
+        $values = implode("','", array_values($arr_data));
+
+        $sql = "INSERT INTO positions ($columns) VALUES ('$values')";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Data has been added!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'edit_official') {
+
+        $id = $_POST['id'];
+        $arr_data = array(
+            'fullname'      => addslashes($_POST['fullname']),
+            'position_id'   => $_POST['position_id'],
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE officials SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Data has been updated!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'edit_position') {
+
+        $id = $_POST['id'];
+        $arr_data = array(
+            'position_name'     => addslashes($_POST['position_name']),
+            'max_count'         => $_POST['max_count'],
+            'level_priority'    => $_POST['level_priority']
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE positions SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Data has been updated!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'delete_official') {
+        $id = $_POST['id'];
+        $sql = "DELETE from officials WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $response = array(
+                'title' => 'Deleted!',
+                'html' => 'Data has been deleted.',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'Failed to delete data.',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'delete_position') {
+        $id = $_POST['id'];
+        $sql = "DELETE from positions WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $sql = "DELETE from officials WHERE position_id = $id";
+            $conn->query($sql);
+            $response = array(
+                'title' => 'Deleted!',
+                'html' => 'Data has been deleted.',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'Failed to delete data.',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'fetch_official') {
+        $id = $_POST['id'];
+        $sql = "SELECT * FROM officials WHERE id = $id";
+        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+        $response = array(
+            'id'            => $row['id'],
+            'fullname'      => $row['fullname'],
+            'position_id'   => $row['position_id'],
+        );
+    }
+    if ($_POST['action'] == 'fetch_position') {
+        $id = $_POST['id'];
+        $sql = "SELECT * FROM positions WHERE id = $id";
+        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+        $response = array(
+            'id'                => $row['id'],
+            'position_name'     => $row['position_name'],
+            'max_count'         => $row['max_count'],
+            'level_priority'    => $row['level_priority'],
+        );
+    }
+    if ($_POST['action'] == 'change_account_status') {
+        $id = $_POST['id'];
+        $is_active = $_POST['switchValue'];
+
+        switch ($is_active) {
+            case 'true':
+                $title = 'Status On';
+                $html = 'Status turned ON';
+                break;
+
+            default:
+                $title = 'Status Off';
+                $html = 'Status turned OFF';
+                break;
+        }
+
+        $sql = "UPDATE users
+                SET is_active = $is_active
+                WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $response = array(
+                'title' => $title,
+                'html' => $html,
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'failed to change publish status.',
+                'icon' => 'error',
+            );
+        }
+    }
+/** USER ACCOUNTS */
+    if ($_POST['action'] == 'create_account') {
+
+        $arr_data = array(
+            'email'             => addslashes($_POST['lname']),
+            'pass'              => password_hash(addslashes($_POST['pass']), PASSWORD_BCRYPT),
+            'activation_code'   => '',
+            'is_active'         => 0,
+            'user_status'       => 'new registered',
+            'user_type'         => $_POST['user_type'],
+        );
+
+        $columns = implode(",", array_keys($arr_data));
+        $values = implode("','", array_values($arr_data));
+
+        $sql = "INSERT INTO users ($columns) VALUES ('$values')";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'status' => 'ok',
+                'title' => 'Success!',
+                'html' => 'Account has been added!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'status' => 'error',
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'edit_account') {
+        $id = $_POST['id'];
+        $arr_data = array(
+            'email'             => addslashes($_POST['lname']),
+            'pass'              => $_POST['pass'],
+            'activation_code'   => '',
+            'is_active'         => 0,
+            'user_status'       => 'account edited',
+            'user_type'         => $_POST['user_type'],
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE user_profile SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'status' => 'ok',
+                'title' => 'Success!',
+                'html' => 'Account has been updated!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'status' => 'error',
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'delete_account') {
+        $id = $_POST['id'];
+        $sql = "DELETE from users WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $response = array(
+                'title' => 'Deleted!',
+                'html' => 'Account has been deleted.',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'Failed to delete data.',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'fetch_account') {
+        $id = $_POST['id'];
+        $sql = "SELECT * FROM users WHERE id = $id";
+        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+        $response = array(
+            'id'                => $row['id'],
+            'email'             => $row['email'],
+            'pass'              => $row['pass'],
+            'user_type'         => $row['user_type'],
+        );
+    }
+    if ($_POST['action'] == 'change_account_status') {
+        $id = $_POST['id'];
+        $is_active = $_POST['switchValue'];
+
+        switch ($is_active) {
+            case 'true':
+                $title = 'Status On';
+                $html = 'Status turned ON';
+                break;
+
+            default:
+                $title = 'Status Off';
+                $html = 'Status turned OFF';
+                break;
+        }
+
+        $sql = "UPDATE users
+                SET is_active = $is_active
+                WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $response = array(
+                'title' => $title,
+                'html' => $html,
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'failed to change publish status.',
+                'icon' => 'error',
+            );
+        }
+    }
 /** SETTINGS */
     if ($_POST['action'] == 'update_settings') {
         $result = $conn->query("TRUNCATE TABLE settings;");
@@ -1460,6 +1776,24 @@ if(isset($_POST['fetch'])){
 
         }
         echo json_decode($response);
+    }
+    if($_POST['fetch'] == 'barangay_officials_list'){
+        $sql = "SELECT *
+                FROM officials
+                LEFT JOIN positions ON officials.position_id = positions.id
+                ORDER BY positions.level_priority ASC";
+        $result = $conn->query($sql);
+        if($result->rowCount() > 0){
+            $response = '';
+            foreach ($result as $row) {
+                $response .= '<h1 class="mt-4">'.$row['fullname'].'</h1>
+                            <span class="h4 text-muted">'.$row['position_name'].'</span>';
+            }
+        }else{
+            $response = 'No officials data found!';
+        }
+
+        echo json_encode($response);
     }
 }
 ?>

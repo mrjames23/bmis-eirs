@@ -1,6 +1,6 @@
 <?php
-include_once('session.php');
 $page = 'Announcements';
+include_once('session.php');
 ?>
 
 <?php include_once('../includes/head.php') ?>
@@ -17,9 +17,11 @@ $page = 'Announcements';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">Announcements</h1>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                <i class="fa fa-plus"></i> CREATE
-                            </button>
+                            <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
+                                <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
+                                    <i class="fa fa-plus"></i> CREATE
+                                </button>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -30,20 +32,22 @@ $page = 'Announcements';
                     <div class="card-body pb-0">
                         <div class="row justify-content-center" id="announcements">
                             <?php
-                                switch ($user['user_type']) {
-                                    case 'ADMIN':
-                                        $sql = "SELECT * FROM announcement ORDER BY created_at DESC";
-                                        break;
-                                    
-                                    default:
-                                        $sql = "SELECT * FROM announcement WHERE is_published = 1 ORDER BY created_at DESC";
-                                        break;
-                                }
+                            switch ($user['user_type']) {
+                                case 'ADMIN':
+                                    $sql = "SELECT * FROM announcement ORDER BY created_at DESC";     
+                                    break;
 
-                                
-                                $result = $conn->query($sql);
-                                if ($result->rowCount() > 0) {
-                                    foreach ($result as $row) {
+                                default:
+                                    $sql = "SELECT * FROM announcement WHERE is_published = 1 ORDER BY created_at DESC";
+                                    break;
+                            }
+
+
+                            $result = $conn->query($sql);
+                            if ($result->rowCount() > 0) {
+                                foreach ($result as $row) {
+
+                                    if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') {
                                         switch ($row['is_published']) {
                                             case 1:
                                                 $is_published = 'checked';
@@ -52,7 +56,22 @@ $page = 'Announcements';
                                                 $is_published = '';
                                                 break;
                                         }
-                                        echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch" id="news_data">
+
+                                        $btn_published = '<label for="publish">Publish&nbsp;</label>
+                                                        <input type="checkbox" name="publish" data-bootstrap-switch data-on-color="success"  id="' . $row['id'] . '"' . $is_published . ' data-val="' . $row['news_title'] . '">';
+                                        $btn_action = '<button type="button" class="btn btn-sm btn-primary edit" id="' . $row['id'] . '">
+                                                            <i class="fa fa-edit"></i>&nbsp;Edit
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger delete" id="' . $row['id'] . '" data-id="' . $row['news_title'] . '">
+                                                            <i class="fa fa-trash"></i>&nbsp;Delete
+                                                        </button>';
+                                    }else{
+                                        $btn_published = '<label for="publish">Published</label>';
+                                        $btn_action    = '';
+                                    }
+
+                                    
+                                    echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch" id="news_data">
                                                 <div class="card bg-light d-flex flex-fill">
                                                     <div class="card-header text-muted border-bottom-0">
                                                         Date : ' . date('M d, Y', strtotime($row['date_content'])) . '
@@ -71,25 +90,15 @@ $page = 'Announcements';
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer justify-content-between">
-                                                        <div>
-                                                            <label for="publish">Publish&nbsp;</label>
-                                                            <input type="checkbox" name="publish" data-bootstrap-switch data-on-color="success"  id="' . $row['id'] . '"' . $is_published . ' data-val="' . $row['news_title'] . '">
-                                                        </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-sm btn-primary edit" id="' . $row['id'] . '">
-                                                                <i class="fa fa-edit"></i>&nbsp;Edit
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-danger delete" id="' . $row['id'] . '" data-id="' . $row['news_title'] . '">
-                                                                <i class="fa fa-trash"></i>&nbsp;Delete
-                                                            </button>
-                                                        </div>
+                                                        <div>'. $btn_published.'</div>
+                                                        <div>'. $btn_action.'</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         ';
-                                    }
-                                } else {
-                                    echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch">
+                                }
+                            } else {
+                                echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch">
                                             <div class="card bg-light d-flex flex-fill">
                                                 <div class="card-header text-muted border-bottom-0">
                                                     Date : Dec 25, 2024
@@ -117,7 +126,7 @@ $page = 'Announcements';
                                                 </div>
                                             </div>
                                         </div>';
-                                } 
+                            }
                             ?>
                         </div>
                     </div>
@@ -165,10 +174,10 @@ $page = 'Announcements';
                                 icon: response.icon,
                                 allowOutsideClick: false,
                             }).then((result) => {
-                                if(result.isConfirmed){
+                                if (result.isConfirmed) {
                                     window.location.reload()
                                 }
-                            })                            
+                            })
                         } else {
                             Swal.fire({
                                 title: response.title,

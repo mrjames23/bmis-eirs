@@ -1,8 +1,7 @@
 <?php
-include_once('session.php');
 $page = 'Certificates';
+include_once('session.php');
 ?>
-
 <?php include_once('../includes/head.php') ?>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -16,7 +15,7 @@ $page = 'Certificates';
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h1 class="card-title">BARANGAY ID</h1>
+                            <h1 class="card-title">Barangay ID</h1>
                             <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                 <i class="fa fa-plus"></i> REQUEST BARANGAY ID
                             </button>

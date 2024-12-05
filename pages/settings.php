@@ -1,6 +1,6 @@
 <?php
-include_once('session.php');
 $page = 'Settings';
+include_once('session.php');
 ?>
 
 <?php include_once('../includes/head.php') ?>
@@ -39,13 +39,35 @@ $page = 'Settings';
                                             <label for="file-input">
                                                 <img class="img-thumbnail img-profile img-circle" id="logo" src="<?= $system_logo ?>" title="Upload logo" style="cursor:pointer; width: 160px; height: 160px;" />
                                             </label>
-                                            <input id="file-input" type="file" accept=".png, .jpg" onchange="readURL(this);" name="file" id="file" hidden  />
+                                            <input id="file-input" type="file" accept=".png, .jpg" onchange="readURL(this);" name="file" id="file" hidden />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="inputEmpId">System Name</label>
                                         <input type="text" class="form-control" name="sys_name" id="sys_name" value="<?= $system_name ?>" required />
                                     </div>
+                                    <div class="form-group">
+                                        <label for="email">Barangay Email</label>
+                                        <input type="email" class="form-control" name="email" id="email" value="" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="text">Barangay Address</label>
+                                        <input type="address" class="form-control" name="address" id="address" value="" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="contact">Barangay Contact No.</label>
+                                        <input type="number" class="form-control" name="contact" id="contact" value="" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="vision">Vision</label>
+                                        <textarea name="" id="" rows="3"></textarea>
+                                        <input type="text" class="form-control" name="vision" id="vision" value="" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mission">Mission</label>
+                                        <input type="text" class="form-control" name="mission" id="mission" value="" required />
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="card-footer">

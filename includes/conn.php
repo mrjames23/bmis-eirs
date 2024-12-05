@@ -160,17 +160,41 @@ try {
                 INDEX (fullname)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
-
 /** SETTINGS */
     $conn->exec("CREATE TABLE IF NOT EXISTS settings (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 logo LONGBLOB DEFAULT NULL,    
                 sys_name TEXT DEFAULT NULL,
+                email TEXT DEFAULT NULL,
+                `address` TEXT DEFAULT NULL,
+                `contact` TEXT DEFAULT NULL,
+                `vision` TEXT DEFAULT NULL,
+                `mission` TEXT DEFAULT NULL,
                 INDEX (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
-
+/** OFFICIALS */
+    $conn->exec("CREATE TABLE IF NOT EXISTS officials (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                fullname TEXT DEFAULT NULL,
+                email TEXT DEFAULT NULL,
+                contact_no TEXT DEFAULT NULL,
+                position_id TEXT DEFAULT NULL,
+                INDEX (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
+/** POSITIONS */
+    $conn->exec("CREATE TABLE IF NOT EXISTS positions (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                position_name TEXT DEFAULT NULL,
+                max_count TEXT DEFAULT NULL,
+                level_priority TEXT DEFAULT NULL,
+                INDEX (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
 /** REGION CITY STREET */
     include_once('region_city.php');
 

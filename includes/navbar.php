@@ -8,18 +8,17 @@
     </ul>
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-
         <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                 <img src="../images/avatar.png" class="user-image img-circle elevation-2" alt="User Image">
-                <span class="d-none d-md-inline">Admin</span>
+                <span class="d-none d-md-inline"><?= $user['user_type'] ?></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <li class="user-header bg-info">
                     <img src="../images/avatar.png" class="img-circle elevation-2" alt="User Image">
                     <p>
-                        NAME
-                        <small>Date Registered</small>
+                        <?= $user['email'] ?>
+                        <small><?= $user['created_at'] ?></small>
                     </p>
                 </li>
                 <li class="user-footer text-sm">
@@ -28,12 +27,6 @@
                     </a>
                 </li>
             </ul>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
-                <i class="fas fa-th-large"></i>
-            </a>
         </li>
     </ul>
 </nav>

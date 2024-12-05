@@ -1,6 +1,6 @@
 <?php
-include_once('session.php');
 $page = 'Certificates';
+include_once('session.php');
 ?>
 
 <?php include_once('../includes/head.php') ?>
@@ -16,7 +16,7 @@ $page = 'Certificates';
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h1 class="card-title">CERTIFICATES</h1>
+                            <h1 class="card-title">Certificates</h1>
                             <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                 <i class="fa fa-plus"></i> REQUEST CERTIFICATE
                             </button>
@@ -40,11 +40,11 @@ $page = 'Certificates';
                                         <thead>
                                             <tr>
                                                 <th style="width: 1%">#</th>
+                                                <th style="width: 20%">STATUS</th>
                                                 <th style="width: 20%">DATE REQUEST</th>
                                                 <th style="width: 20%">FULL NAME</th>
                                                 <th style="width: 20%">CERTIFICATE REQUEST</th>
                                                 <th style="width: 20%">PURPOSE</th>
-                                                <th style="width: 20%">STATUS</th>
                                                 <th style="width: 20%">ACTION</th>
                                             </tr>
                                         </thead>

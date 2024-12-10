@@ -44,6 +44,7 @@ include_once('session.php');
                                                 <th style="width: 20%">USER TYPE</th>
                                                 <th style="width: 20%">DATE REGISTERED</th>
                                                 <th style="width: 20%">ACCOUNT STATUS</th>
+                                                <th style="width: 20%">IS ACTIVE</th>
                                                 <th style="width: 20%">ACTION</th>
                                             </tr>
                                         </thead>
@@ -76,19 +77,16 @@ include_once('session.php');
                     },
                     success: function(response) {
                         Swal.close()
-                        if (response.status == 'ok') {
+                        if (response.icon == 'success') {
                             Swal.fire({
                                 title: response.title,
                                 text: response.text,
                                 html: response.html,
                                 icon: response.icon,
                                 allowOutsideClick: false,
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    table.ajax.reload(null, false)
-                                }
                             })
-
+                            table.ajax.reload(null, false)
+                            $('#modal').modal('hide')
                         } else {
                             Swal.fire({
                                 title: response.title,
@@ -226,6 +224,11 @@ include_once('session.php');
                 var pass2 = $('#pass2')
                 validatePass(pass1, pass2)
             });
+            $('#modal').on('hidden.bs.modal', function() {
+                $('#form')[0].reset()
+                $('[name="pass"]').removeClass('is-valid')
+                $('[name="pass2"]').removeClass('is-valid')
+            })
 
             function validatePass(pass1, pass2) {
                 if (pass1.val() != '' & pass2.val() != '') {

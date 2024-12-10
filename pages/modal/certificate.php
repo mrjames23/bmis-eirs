@@ -63,10 +63,6 @@
                                         <label for="customRadio7" class="custom-control-label">Certificate of Solo Parent</label>
                                     </div>
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio8" name="cert_type" value="Certificate of Cohabilitation" required>
-                                        <label for="customRadio8" class="custom-control-label">Certificate of Cohabilitation</label>
-                                    </div>
-                                    <div class="custom-control custom-radio m-2">
                                         <input class="custom-control-input" type="radio" id="customRadio6" name="cert_type" value="Certification of Living Together" required>
                                         <label for="customRadio6" class="custom-control-label">Certification of Living Together</label>
                                     </div>
@@ -81,36 +77,31 @@
                             <form id="form2">
                                 <div class="form-group h4">
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio1" name="cert_type" required>
-                                        <label for="customRadio1" class="custom-control-label">Barangay Certification</label>
+                                        <input class="custom-control-input" type="radio" id="purpose1" name="purpose" value="Local Employment" required>
+                                        <label for="purpose1" class="custom-control-label">Local Employment</label>
                                     </div>
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio2" name="cert_type" required>
-                                        <label for="customRadio2" class="custom-control-label">Certificate of Indigency</label>
+                                        <input class="custom-control-input" type="radio" id="purpose2" name="purpose" value="Medical Assistance/Hospital Requirement" required>
+                                        <label for="purpose2" class="custom-control-label">Medical Assistance/Hospital Requirement</label>
                                     </div>
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio3" name="cert_type" required>
-                                        <label for="customRadio3" class="custom-control-label">Certificate of Residency</label>
+                                        <input class="custom-control-input" type="radio" id="purpose3" name="purpose" value="School Purposes" required>
+                                        <label for="purpose3" class="custom-control-label">School Purposes</label>
                                     </div>
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio4" name="cert_type" required>
-                                        <label for="customRadio4" class="custom-control-label">Certificate of Non-Residency</label>
+                                        <input class="custom-control-input" type="radio" id="purpose4" name="purpose" value="Travel/Transfer of Residency" required>
+                                        <label for="purpose4" class="custom-control-label">Travel/Transfer of Residency</label>
                                     </div>
                                     <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio5" name="cert_type" required>
-                                        <label for="customRadio5" class="custom-control-label">Certificate of Guardianship</label>
+                                        <input class="custom-control-input" type="radio" id="purpose5" name="purpose" value="First Time Jobseekers Assistance Act (RA 11261)" required>
+                                        <label for="purpose5" class="custom-control-label">First Time Jobseekers Assistance Act (RA 11261)</label>
                                     </div>
-                                    <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio7" name="cert_type" required>
-                                        <label for="customRadio7" class="custom-control-label">Certificate of Solo Parent</label>
-                                    </div>
-                                    <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio8" name="cert_type" required>
-                                        <label for="customRadio8" class="custom-control-label">Certificate of Cohabilitation</label>
-                                    </div>
-                                    <div class="custom-control custom-radio m-2">
-                                        <input class="custom-control-input" type="radio" id="customRadio6" name="cert_type" required>
-                                        <label for="customRadio6" class="custom-control-label">Certification of Living Together</label>
+                                    <div class="row pl-2">
+                                        <div class="custom-control custom-radio m-2">
+                                            <input class="custom-control-input" type="radio" id="purpose6" name="purpose" value="Others" required>
+                                            <label for="purpose6" class="custom-control-label">Others</label>
+                                        </div>
+                                        <input type="text" class="form-control col-sm-6" name="specify" id="specify" placeholder="Please specify if others.">
                                     </div>
                                 </div>
                                 <div class="modal-footer justify-content-between pl-0 pr-0 pb-0">

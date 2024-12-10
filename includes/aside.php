@@ -166,7 +166,7 @@
                         <a href="barangay_id.php" class="nav-link">
                             <i class="nav-icon fas fa-id-card"></i>
                             <p>
-                                Barabgay ID
+                                Barangay ID
                             </p>
                         </a>
                     </li>

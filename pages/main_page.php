@@ -1,5 +1,5 @@
 <?php
-$page = 'Baranggay Information';
+$page = 'Barangay Information';
 include_once('session.php');
 
 $sql = "SELECT * FROM brgy_info ORDER BY id DESC LIMIT 1";

@@ -46,6 +46,7 @@ include_once('session.php');
                                                 <th style="width: 20%">AGE</th>
                                                 <th style="width: 20%">GENDER</th>
                                                 <th style="width: 20%">CIVIL STATUS</th>
+                                                <th style="width: 20%">CONTACT #</th>
                                                 <th style="width: 20%">VOTER STATUS</th>
                                                 <th style="width: 20%">ACTION</th>
                                             </tr>
@@ -125,47 +126,71 @@ include_once('session.php');
                 })
                 data.append('file', $('#modal #file')[0].files[0])
 
-                // Send the form data to the server using AJAX
-                $.ajax({
-                    type: 'POST',
-                    url: 'ajax.php', // Replace with your server-side script
-                    data: data,
-                    dataType: "json",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function() {
-                        loading()
-                    },
-                    success: function(response) {
-                        if (response.status == 'ok') {
-                            $('#modal').modal('hide')
-                            $('#modal form').trigger('reset')
-                            Swal.fire({
-                                title: response.title,
-                                text: response.text,
-                                html: response.html,
-                                icon: response.icon,
-                                allowOutsideClick: false,
-                            })
-                            table.ajax.reload(null, false)
-                        } else {
-                            Swal.fire({
-                                title: response.title,
-                                text: response.text,
-                                html: response.html,
-                                icon: response.icon,
-                                allowOutsideClick: false,
-                            })
+                //validate contact
+                var contact = $('[name="contact_no"]').val().replace(/[^0-9]/gi, '');
+                if (contact.length != 11) {
+                    $('[name="contact_no"]').addClass('is-invalid')
+                } else {
+                    $('[name="contact_no"]').removeClass('is-invalid')
+                    $('[name="contact_no"]').removeClass('is-valid')
+                    // Send the form data to the server using AJAX
+                    $.ajax({
+                        type: 'POST',
+                        url: 'ajax', // Replace with your server-side script
+                        data: data,
+                        dataType: "json",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function() {
+                            loading()
+                        },
+                        success: function(response) {
+                            if (response.status == 'ok') {
+                                $('#modal').modal('hide')
+                                $('#modal form').trigger('reset')
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.text,
+                                    html: response.html,
+                                    icon: response.icon,
+                                    allowOutsideClick: false,
+                                })
+                                table.ajax.reload(null, false)
+                            } else {
+                                Swal.fire({
+                                    title: response.title,
+                                    text: response.text,
+                                    html: response.html,
+                                    icon: response.icon,
+                                    allowOutsideClick: false,
+                                })
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            error()
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        error()
-                    }
-                });
+                    });
+                }
             } else {
                 form4.reportValidity();
             }
+        }
+
+        function fetchAddress(tbl, val) {
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: {
+                    fetch: 'address',
+                    val: val,
+                    tbl: tbl
+                },
+                dataType: "json",
+                success: function(response) {
+                    return response.data
+                }
+            });
         }
         // Show add record modal
         $(document).on('click', '.create', function() {
@@ -266,18 +291,6 @@ include_once('session.php');
                 }
             })
         });
-        // Reset step tab on modal close
-        $(document).ready(function() {
-            var stepper = new Stepper($('.bs-stepper')[0])
-            $('#modal').on('hidden.bs.modal', function() {
-                // Reset the form fields
-                $('#form1')[0].reset();
-                $('#form2')[0].reset();
-                $('#form3')[0].reset();
-                $('#form4')[0].reset();
-            });
-
-        });
         //Fetch address selection
         $(document).on('change', '.address', function() {
             var id = $(this).attr('id')
@@ -321,22 +334,38 @@ include_once('session.php');
                 }
             });
         });
-
-        function fetchAddress(tbl, val) {
-            $.ajax({
-                type: "post",
-                url: "ajax",
-                data: {
-                    fetch: 'address',
-                    val: val,
-                    tbl: tbl
-                },
-                dataType: "json",
-                success: function(response) {
-                    return response.data
-                }
-            });
-        }
+        // Calculate age by bdate
+        $(document).on('change', '#bdate', function() {
+            bdate = new Date($(this).val())
+            var today = new Date()
+            var age = Math.floor((today - bdate) / (365.25 * 24 * 60 * 60 * 1000));
+            $('#age').val(age);
+        });
+        // Reset step tab on modal close
+        $('#modal').on('hidden.bs.modal', function() {
+            // Reset the form fields
+            $('#form1')[0].reset();
+            $('#form2')[0].reset();
+            $('#form3')[0].reset();
+            $('#form4')[0].reset();
+            // Reset the step tab
+            stepper.reset()
+            //Reset validation
+            $('[name="contact_no"]').removeClass('is-invalid')
+            $('[name="contact_no"]').removeClass('is-valid')
+        });
+        //validate Contact No via keypress
+        $(document).on('change keypress', '[name="contact_no"]', function(e) {
+            e.preventDefault();
+            var contact = $(this).val().replace(/[^0-9]/gi, '');
+            if (contact.length != 11) {
+                $('[name="contact_no"]').removeClass('is-valid')
+                $('[name="contact_no"]').addClass('is-invalid')
+            } else {
+                $('[name="contact_no"]').removeClass('is-invalid')
+                $('[name="contact_no"]').addClass('is-valid')
+            }
+        });
     </script>
     <script>
         var table = $('#dataTable').DataTable({

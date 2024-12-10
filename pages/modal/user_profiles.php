@@ -83,7 +83,7 @@
                                     <div class="col-12 col-sm-6">
                                         <div class="form-group">
                                             <label for="name">Birth Date <span class="text-danger">*</span></label>
-                                            <input type="date" class="form-control" name="bdate" id="bdate" required>
+                                            <input type="date" class="form-control" name="bdate" id="bdate" max="2024-12-31" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="name">Age <span class="text-danger">*</span></label>
@@ -164,39 +164,18 @@
                                     <label for="province" class="col-form-label col-12 col-sm-3">Province <span class="text-danger">*</span></label>
                                     <select class="custom-select col-12 col-sm-9 address" name="province" id="province" data-id="refcitymun" data-val="citymunDesc" data-code="provCode" required>
                                         <option value="" selected hidden disabled>Pumili ng Probinsya</option>
-                                        <?php
-                                        // $sql = "SELECT * FROM refprovince";
-                                        // $result = $conn->query($sql);
-                                        // while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                        //     echo '<option value="' . $row['provCode'] . '">' . $row['provDesc'] . '</option>';
-                                        // }
-                                        ?>
                                     </select>
                                 </div>
                                 <div class="form-group row">
                                     <label for="city" class="col-form-label col-12 col-sm-3">City <span class="text-danger">*</span></label>
                                     <select class="custom-select col-12 col-sm-9 address" name="city" id="city" data-id="refbrgy" data-val="brgyDesc" data-code="citymunCode" required>
                                         <option value="" selected hidden disabled>Pumili ng City</option>
-                                        <?php
-                                        // $sql = "SELECT * FROM refcitymun";
-                                        // $result = $conn->query($sql);
-                                        // while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                        //     echo '<option value="' . $row['citymunCode'] . '">' . $row['citymunDesc'] . '</option>';
-                                        // }
-                                        ?>
                                     </select>
                                 </div>
                                 <div class="form-group row">
                                     <label for="barangay" class="col-form-label col-12 col-sm-3">Barangay <span class="text-danger">*</span></label>
                                     <select class="custom-select col-12 col-sm-9" name="brgy" id="brgy" required>
                                         <option value="" selected hidden disabled>Pumili ng Barangay</option>
-                                        <?php
-                                        // $sql = "SELECT * FROM refbrgy";
-                                        // $result = $conn->query($sql);
-                                        // while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                                        //     echo '<option value="' . $row['brgyCode'] . '">' . $row['brgyDesc'] . '</option>';
-                                        // }
-                                        ?>
                                     </select>
                                 </div>
                                 <div class="form-group row">
@@ -215,12 +194,12 @@
                         <div id="step4" class="content" role="tabpanel" aria-labelledby="stepperTrigger4">
                             <form id="form4" class="form-horizontal">
                                 <div class="form-group row">
-                                    <label for="phone_no" class="col-form-label col-sm-3 col-12">Contact Number <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control col-sm-9 col-12" name="contact_no" id="contact_no" placeholder="Contact Number" required>
+                                    <label for="phone_no" class="col-form-label col-sm-3 col-12">Phone Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control col-sm-9 col-12" name="contact_no" id="contact_no" placeholder="Phone Number" required data-inputmask='"mask": "(9999)999-9999"' data-mask>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="email" class="col-form-label col-sm-3 col-12">Email Address</label>
-                                    <input type="email" class="form-control col-sm-9 col-12" name="email" id="email" placeholder="Email Address">
+                                    <label for="email" class="col-form-label col-sm-3 col-12">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control col-sm-9 col-12" name="email" id="email" placeholder="Email Address" required>
                                 </div>
                                 <div class="modal-footer justify-content-between pl-0 pr-0 pb-0">
                                     <div>

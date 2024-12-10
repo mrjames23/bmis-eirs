@@ -124,7 +124,8 @@ try {
                 street TEXT DEFAULT NULL,
                 contact_no TEXT DEFAULT NULL,
                 request_status TEXT DEFAULT NULL,
-                is_active TEXT DEFAULT NULL,                
+                remarks TEXT DEFAULT NULL,                
+                claiming_date TEXT DEFAULT NULL,                
                 updated_at TEXT DEFAULT NULL,                
                 INDEX (email)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -133,6 +134,7 @@ try {
     $conn->exec("CREATE TABLE IF NOT EXISTS barangay_id (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                photo LONGBLOB DEFAULT NULL,
                 email VARCHAR(255) DEFAULT NULL,
                 fullname TEXT DEFAULT NULL,
                 bdate TEXT DEFAULT NULL,
@@ -155,7 +157,8 @@ try {
                 emergency_relationship TEXT DEFAULT NULL,
                 emergency_address TEXT DEFAULT NULL,
                 request_status TEXT DEFAULT NULL,
-                is_active TEXT DEFAULT NULL,                
+                remarks TEXT DEFAULT NULL,
+                claiming_date TEXT DEFAULT NULL,                
                 updated_at TEXT DEFAULT NULL,                
                 INDEX (fullname)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -171,6 +174,17 @@ try {
                 `contact` TEXT DEFAULT NULL,
                 `vision` TEXT DEFAULT NULL,
                 `mission` TEXT DEFAULT NULL,
+                INDEX (id)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
+/** EMAIL NOTIFICATION */
+    $conn->exec("CREATE TABLE IF NOT EXISTS email_notification (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                logo LONGBLOB DEFAULT NULL,    
+                notification_for TEXT DEFAULT NULL,
+                subject_title TEXT DEFAULT NULL,
+                message_content TEXT DEFAULT NULL,
                 INDEX (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");

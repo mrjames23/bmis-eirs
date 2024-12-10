@@ -17,9 +17,11 @@ include_once('session.php');
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">Certificates</h1>
+                            <?php if($user['user_type'] == 'USER'){?>
                             <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                 <i class="fa fa-plus"></i> REQUEST CERTIFICATE
                             </button>
+                            <?php }?>
                         </div>
                     </div>
                 </div>
@@ -32,6 +34,11 @@ include_once('session.php');
                                 <div class="card-header">
                                     <h4 class="card-title">Request Table</h4>
                                     <div class="card-tools">
+                                        <?php if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){?>
+                                        <button class="btn btn-info btn-sm notification" data-toggle="modal" data-target="#modal_notification">
+                                            <i class="fa fa-envelope"></i>&nbsp;EMAIL NOTIFICATION
+                                        </button>
+                                        <?php }?>
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                                     </div>
                                 </div>
@@ -45,7 +52,8 @@ include_once('session.php');
                                                 <th style="width: 20%">FULL NAME</th>
                                                 <th style="width: 20%">CERTIFICATE REQUEST</th>
                                                 <th style="width: 20%">PURPOSE</th>
-                                                <th style="width: 20%">ACTION</th>
+                                                <th style="width: 20%">REMARKS STATUS</th>
+                                                <th style="width: 20%" class="text-center">ACTION</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -59,6 +67,7 @@ include_once('session.php');
         <?php include_once('../includes/footer.php') ?>
     </div>
     <?php include_once('./modal/certificate.php') ?>
+    <?php include_once('./modal/email_notification.php') ?>
     <?php include_once('../includes/script.php') ?>
     <script>
         // Initialize the stepper
@@ -130,6 +139,7 @@ include_once('session.php');
                                 allowOutsideClick: false,
                             })
                             table.ajax.reload(null, false)
+                            stepper.reset()
                         } else {
                             Swal.fire({
                                 title: response.title,
@@ -225,7 +235,222 @@ include_once('session.php');
                 }
             })
         });
-        //Select certificate purpose
+        // Process request
+        $(document).on('click', '.process', function() {
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: {
+                    id: $(this).attr('id'),
+                    status: $(this).data('id'),
+                    action: 'process_request_certificate'
+                },
+                dataType: "json",
+                beforeSend: function() {
+                    loading()
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: response.title,
+                        text: response.text,
+                        html: response.html,
+                        icon: response.icon,
+                        allowOutsideClick: false,
+                    })
+                    table.ajax.reload(null, false)
+                },
+                error: () => {
+                    error()
+                }
+            });
+        });
+        // Decline request
+        $(document).on('click', '.decline', function() {
+            let id = $(this).attr('id')
+            let data = $(this).data('id')
+            let val = $(this).data('val')
+            Swal.fire({
+                title: 'Decline request?',
+                html: 'Confirm decline request for<b class="text-primary">&nbsp;' + data + '</b>.',
+                icon: 'question',
+                allowOutsideClick: false,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                input: 'text',
+                inputPlaceholder: 'Enter reason for declining request',
+                preConfirm: (result) => {
+                    if (result === '') {
+                        Swal.showValidationMessage('Please enter decline remarks')
+                    }
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "post",
+                        url: "ajax",
+                        data: {
+                            id: $(this).attr('id'),
+                            email: val,
+                            remarks: result.value,
+                            action: 'decline_request_certificate'
+                        },
+                        dataType: "json",
+                        beforeSend: function() {
+                            loading()
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: response.title,
+                                text: response.text,
+                                html: response.html,
+                                icon: response.icon,
+                                allowOutsideClick: false,
+                            })
+                            table.ajax.reload(null, false)
+                        },
+                        error: () => {
+                            error()
+                        }
+                    });
+                }
+            });
+        });
+        // Undo decline request
+        $(document).on('click', '.undo', function() {
+            let id = $(this).attr('id')
+            let data = $(this).data('id')
+            Swal.fire({
+                title: 'Confirm Undo?',
+                html: 'Remove decline request for<b class="text-primary">&nbsp;' + data + '</b>.',
+                icon: 'question',
+                allowOutsideClick: false,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "post",
+                        url: "ajax",
+                        data: {
+                            id: $(this).attr('id'),
+                            action: 'undo_request_certificate'
+                        },
+                        dataType: "json",
+                        beforeSend: function() {
+                            loading()
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: response.title,
+                                text: response.text,
+                                html: response.html,
+                                icon: response.icon,
+                                allowOutsideClick: false,
+                            })
+                            table.ajax.reload(null, false)
+                        },
+                        error: () => {
+                            error()
+                        }
+                    });
+                }
+            });
+        });
+        // Approve request
+        $(document).on('click', '.approve', function() {
+            let id = $(this).attr('id')
+            let data = $(this).data('id')
+            let val = $(this).data('val')
+            const today = (new Date()).toISOString();
+            Swal.fire({
+                title: 'Approve request?',
+                icon: 'question',
+                allowOutsideClick: false,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                text: '123',
+                html: `<br>Confirm and enter claiming date for certificate request of</br><b class="text-primary">&nbsp;` + data + `</b></p>.
+                        <input id="date" class="swal2-input" type="date" min="` + today.split("T")[0] + `">`,
+                focusConfirm: false,
+
+                preConfirm: () => {
+                    const date = Swal.getPopup().querySelector('#date').value
+                    if (!date) {
+                        Swal.showValidationMessage('Please select claiming date!')
+                    }
+                    return {
+                        date: date,
+                    }
+                }
+            }).then((result) => {
+                var date = $('#date').val()
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "post",
+                        url: "ajax",
+                        data: {
+                            id: $(this).attr('id'),
+                            date: date,
+                            email: val,
+                            action: 'approve_request_certificate'
+                        },
+                        dataType: "json",
+                        beforeSend: function() {
+                            loading()
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: response.title,
+                                text: response.text,
+                                html: response.html,
+                                icon: response.icon,
+                                allowOutsideClick: false,
+                            })
+                            table.ajax.reload(null, false)
+                        },
+                        error: () => {
+                            error()
+                        }
+                    });
+                }
+            });
+        });
+        // Claim request
+        $(document).on('click', '.claim', function() {
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: {
+                    id: $(this).attr('id'),
+                    email: $(this).data('val'),
+                    action: 'claim_request_certificate'
+                },
+                dataType: "json",
+                beforeSend: function() {
+                    loading()
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: response.title,
+                        text: response.text,
+                        html: response.html,
+                        icon: response.icon,
+                        allowOutsideClick: false,
+                    })
+                    table.ajax.reload(null, false)
+                },
+                error: () => {
+                    error()
+                }
+            });
+        });
+        // Select certificate purpose
         $(document).on('change', '[name="cert_type"]', function() {
             var cert_type = $(this).val();
             $.ajax({
@@ -241,7 +466,18 @@ include_once('session.php');
                 }
             });
         });
-        //Fetch address selection
+        // Condition if selected Cert Purpose is OTHERS
+        $(document).on('change', '[name="purpose"]', function() {
+            if ($(this).val() == 'Others') {
+                $('#form2 #specify').prop('disabled', 0)
+                $('#form2 #specify').prop('required', 1)
+            } else {
+                $('#form2 #specify').prop('disabled', 1)
+                $('#form2 #specify').prop('required', 0)
+                $('#form2 #specify').val('')
+            }
+        });
+        // Fetch address selection
         $(document).on('change', '.address', function() {
             var id = $(this).attr('id')
             var data = $(this).data('id')
@@ -281,6 +517,59 @@ include_once('session.php');
                 },
                 error: function() {
                     error()
+                }
+            });
+        });
+        // Email Notification
+        $(document).on('click', '.notification', function() {
+            var type = 'Certificate Request'
+            $('#modal_notification #type').val(type)
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: {
+                    fetch: 'email_notification',
+                    type: type
+                },
+                dataType: "json",
+                success: function(response) {
+                    $('#modal_notification #subject_title').val(response.subject_title)
+                    $('#modal_notification #message_content').val(response.message_content)
+                },
+                error: function() {
+                    error()
+                }
+            });
+        });
+        // Submit Email notification
+        $('#modal_notification #form').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "ajax",
+                data: $(this).serialize(),
+                dataType: "json",
+                beforeSend: function() {
+                    loading();
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: response.title,
+                        text: response.text,
+                        html: response.html,
+                        icon: response.icon,
+                        allowOutsideClick: false,
+                    })
+                    $('#modal_notification').modal('hide')
+                },
+                error: function(error) {
+                    console.error();
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Something went wrong!',
+                        icon: 'error',
+                        confirmButtonText: 'Exit'
+                    })
                 }
             });
         });

@@ -2,8 +2,15 @@
 include_once('session.php');
 $updated_at = date('Y-m-d H:i:s');
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+require('../library/PHPMailer-master/src/Exception.php');
+require('../library/PHPMailer-master/src/PHPMailer.php');
+require('../library/PHPMailer-master/src/SMTP.php');
+
 if(isset($_POST['table'])){
-    if ($_POST['table'] == 'user_accounts') {
+    if($_POST['table'] == 'user_accounts') {
         $sql = "SELECT * FROM users";
         $result = $conn->query($sql);
         $count = 1;
@@ -57,6 +64,7 @@ if(isset($_POST['table'])){
             $sub_array[] = $row['email'];
             $sub_array[] = $row['user_type'];
             $sub_array[] = $row['created_at'];
+            $sub_array[] = '<span class="badge badge-default">'. strtoupper($row['user_status']).'</span>';
             $sub_array[] = $is_active;
             $sub_array[] = $action;
             $data[] = $sub_array;
@@ -115,47 +123,84 @@ if(isset($_POST['table'])){
             $sub_array[] = $age;
             $sub_array[] = $row['gender'];
             $sub_array[] = $row['civil_status'];
+            $sub_array[] = $row['contact_no'];
             $sub_array[] = $voters_status;
             $sub_array[] = $edit.'&nbsp;'.$delete;
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
     }
-    if ($_POST['table'] == 'certificates') {
-        $sql = "SELECT * FROM certificates";
+    if($_POST['table'] == 'certificates') {
+        if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){
+            $sql = "SELECT * FROM certificates";
+        }else{
+            $sql = "SELECT * FROM certificates WHERE email = '{$user['email']}'";
+        }
+
+        
         $result = $conn->query($sql);
         $count = 1;
         foreach ($result as $row) {
             // Action Buttons
-            $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['id'] . '"  data-id="' . $row['email'] . '">
-                        <i class="fa fa-edit"></i>&nbsp;Edit
+            $delete = '<button type="button" class="btn btn-outline-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-times"></i>
+                    </button>&nbsp;';           
+            $approve = '<button type="button" class="btn btn-primary btn-sm approve" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="'.$row['email'].'">
+                        <i class="fa fa-thumbs-up"></i>&nbsp;Approve
                     </button>&nbsp;';
-            $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['email']  . '">
-                        <i class="fa fa-trash"></i>&nbsp;Delete
+            $decline = '<button type="button" class="btn btn-danger btn-sm decline" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-thumbs-down"></i>&nbsp;Decline
                     </button>&nbsp;';
-            $view = "";            
+            $claim = '<button type="button" class="btn btn-success btn-sm claim" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="' . $row['email'] . '">
+                        <i class="fa fa-check"></i>&nbsp;Claim
+                    </button>&nbsp;';
+            $undo = '<button type="button" class="btn btn-secondary btn-sm undo" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-history"></i>&nbsp;Revert
+                    </button>&nbsp;';   
             // Define user status and buttons
             switch ($row['request_status']) {
                 case 'Pending':
-                    $status = '<div class="project-state">
-                                            <span class="badge badge-danger">' . $row['request_status'] . '</span>
-                                        </div>';
+                    $status = '<span class="badge badge-warning rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<button type="button" class="btn btn-info btn-sm process" id="' . $row['id'] . '"  data-id="' . $row['request_status'] . '">
+                                    <i class="fa fa-pen"></i>&nbsp;Process
+                                </button>&nbsp;';
+                    $action = $decline;
+                    $undo = '';
                     break;
-
+                case 'Processing':
+                    $status = '<span class="badge badge-info rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<button type="button" class="btn btn-warning btn-sm process" id="' . $row['id'] . '"  data-id="' . $row['request_status'] . '">
+                                    <i class="fa fa-pen"></i>&nbsp;Pending
+                                </button>&nbsp;';
+                    $action = $approve;
+                    $undo = '';
+                    break;
+                case 'Declined':
+                    $status = '<span class="badge badge-danger rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<span class="text-danger">DECLINED&nbsp;<span>';
+                    $action = '';
+                    $undo = $undo;
+                    break;
+                case 'For Claim':
+                    $status = '<span class="badge badge-primary rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '';
+                    $action = $claim;
+                    $undo = '';
+                    break;
                 default:
-                    $status = '<div class="project-state">
-                                        <span class="badge badge-secondary">' . $row['user_status'] . '</span>
-                                    </div>';
-                    $action = $delete;
+                    $status = '<span class="badge badge-success rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<span class="text-success">COMPLETED&nbsp;<span>';
+                    $action = '';
+                    $undo = $undo;
                     break;
             }
             // Define action buttons via user type
             switch ($user['user_type']) {
                 case 'ADMIN':
-                    $action = $delete;
+                    $action = $process. $action. $undo. $delete;
                     break;
                 case 'STAFF':
-                    $action = $delete;
+                    $action = $process . $action;
                     break;                
                 default:
                     $action = '';
@@ -169,46 +214,83 @@ if(isset($_POST['table'])){
             $sub_array[] = $row['fullname'];
             $sub_array[] = $row['cert_type'];
             $sub_array[] = $row['cert_purpose'];
-            $sub_array[] = $action;
+            $sub_array[] = $row['remarks'];
+            $sub_array[] = '<div class="text-right">'.$action.'</div>';
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
     }
-    if ($_POST['table'] == 'barangay_id') {
-        $sql = "SELECT * FROM barangay_id";
+    if($_POST['table'] == 'barangay_id') {
+
+        if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){
+            $sql = "SELECT * FROM barangay_id";
+        }else{
+            $sql = "SELECT * FROM barangay_id WHERE email = '{$user['email']}'";
+        }
+        
         $result = $conn->query($sql);
         $count = 1;
         foreach ($result as $row) {
             // Action Buttons
-            $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['id'] . '"  data-id="' . $row['id'] . '">
-                        <i class="fa fa-edit"></i>&nbsp;Edit
+            $delete = '<button type="button" class="btn btn-outline-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-times"></i>
+                    </button>&nbsp;';           
+            $approve = '<button type="button" class="btn btn-primary btn-sm approve" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="'.$row['email'].'">
+                        <i class="fa fa-thumbs-up"></i>&nbsp;Approve
                     </button>&nbsp;';
-            $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['id']  . '">
-                        <i class="fa fa-trash"></i>&nbsp;Delete
+            $decline = '<button type="button" class="btn btn-danger btn-sm decline" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-thumbs-down"></i>&nbsp;Decline
                     </button>&nbsp;';
-            $view = "";            
+            $claim = '<button type="button" class="btn btn-success btn-sm claim" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="' . $row['email'] . '">
+                        <i class="fa fa-check"></i>&nbsp;Claim
+                    </button>&nbsp;';
+            $undo = '<button type="button" class="btn btn-secondary btn-sm undo" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
+                        <i class="fa fa-history"></i>&nbsp;Revert
+                    </button>&nbsp;';
             // Define user status and buttons
             switch ($row['request_status']) {
                 case 'Pending':
-                    $status = '<div class="project-state">
-                                            <span class="badge badge-danger">' . $row['request_status'] . '</span>
-                                        </div>';
+                    $status = '<span class="badge badge-warning rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<button type="button" class="btn btn-info btn-sm process" id="' . $row['id'] . '"  data-id="' . $row['request_status'] . '">
+                                    <i class="fa fa-pen"></i>&nbsp;Process
+                                </button>&nbsp;';
+                    $action = $decline;
+                    $undo = '';
                     break;
-
+                case 'Processing':
+                    $status = '<span class="badge badge-info rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<button type="button" class="btn btn-warning btn-sm process" id="' . $row['id'] . '"  data-id="' . $row['request_status'] . '">
+                                    <i class="fa fa-pen"></i>&nbsp;Pending
+                                </button>&nbsp;';
+                    $action = $approve;
+                    $undo = '';
+                    break;
+                case 'Declined':
+                    $status = '<span class="badge badge-danger rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<span class="text-danger">DECLINED&nbsp;<span>';
+                    $action = '';
+                    $undo = $undo;
+                    break;
+                case 'For Claim':
+                    $status = '<span class="badge badge-primary rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '';
+                    $action = $claim;
+                    $undo = '';
+                    break;
                 default:
-                    $status = '<div class="project-state">
-                                        <span class="badge badge-secondary">' . $row['user_status'] . '</span>
-                                    </div>';
-                    $action = $delete;
+                    $status = '<span class="badge badge-success rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
+                    $process = '<span class="text-success">COMPLETED&nbsp;<span>';
+                    $action = '';
+                    $undo = $undo;
                     break;
             }
             // Define action buttons via user type
             switch ($user['user_type']) {
                 case 'ADMIN':
-                    $action = $delete;
+                    $action = $process . $action . $undo . $delete;
                     break;
                 case 'STAFF':
-                    $action = $delete;
+                    $action = $process . $action;
                     break;
                 default:
                     $action = '';
@@ -235,25 +317,31 @@ if(isset($_POST['table'])){
             }
             $address = $row['street'].', '. $brgy.' '.$city.', '.$province;
 
+            $image = $row['photo'] ? $row['photo'] : '../images/avatar.png';
+            $fullname = '<ul class="list-inline">
+                        <li class="list-inline-item">
+                            <img alt="Avatar" class="table-avatar" src="' . $image . '">
+                        </li>                              
+                        <li class="list-inline-item">'.$row['fullname'].'</li>                              
+                    </ul>';
+
             $sub_array = array();
             $sub_array[] = $count++ . '.';
             $sub_array[] = $status;
             $sub_array[] = $row['created_at'];
-            $sub_array[] = $row['fullname'];
-            $sub_array[] = $row['gender'];
+            $sub_array[] = $fullname;
             $sub_array[] = $row['bdate'];
-            $sub_array[] = $row['contact_no'];
             $sub_array[] = $address;
             $sub_array[] = $row['emergency_person'];
             $sub_array[] = $row['emergency_relationship'];
             $sub_array[] = $row['emergency_address'];
             $sub_array[] = $row['emergency_contact'];
-            $sub_array[] = $action;
+            $sub_array[] = '<div class="text-right">'.$action.'</div>';
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
     }
-    if ($_POST['table'] == 'officials') {
+    if($_POST['table'] == 'officials') {
         $sql = "SELECT *, officials.id AS o_id FROM officials LEFT JOIN positions ON positions.id = officials.position_id ORDER BY level_priority ASC";
         $result = $conn->query($sql);
         $count = 1;
@@ -283,7 +371,7 @@ if(isset($_POST['table'])){
         }
         $response = array('data' => $data ?? '');
     }
-    if ($_POST['table'] == 'positions') {
+    if($_POST['table'] == 'positions') {
         $sql = "SELECT * FROM positions ORDER BY level_priority ASC";
         $result = $conn->query($sql);
         $count = 1;
@@ -792,16 +880,23 @@ if(isset($_POST['action'])){
     }
 
 /** CERTIFICATES */
-    if ($_POST['action'] == 'create_request_certificate') {
+    if($_POST['action'] == 'create_request_certificate') {        
 
         $fullname = $_POST['lname'] ? $_POST['lname'] . ', ' : '';
         $fullname .= $_POST['fname'] ? $_POST['fname']. ' ' : '';
         $fullname .= $_POST['mname'] ? ' ' . substr($_POST['mname'], 0, 1) . '. ' : '';
         $fullname .= $_POST['suffix'] ? $_POST['suffix'] : '';
 
+        if($_POST['purpose'] == 'Others'){
+            $purpose = $_POST['purpose'].' : '.$_POST['specify'];
+        }else{
+            $purpose = $_POST['purpose'];
+        }
+
         $arr_data = array(
+            'email'             => $user['email'],
             'cert_type'         => $_POST['cert_type'],
-            'cert_purpose'      => $_POST['purpose'],
+            'cert_purpose'      => $purpose,
             'fullname'          => strtoupper($fullname),
             'region'            => $_POST['region'],
             'province'          => $_POST['province'],
@@ -809,6 +904,7 @@ if(isset($_POST['action'])){
             'brgy'              => $_POST['brgy'],
             'street'            => $_POST['street'],
             'request_status'    => 'Pending',
+            'remarks'           => 'New request',
         );
 
         $columns = implode(",", array_keys($arr_data));
@@ -830,7 +926,7 @@ if(isset($_POST['action'])){
             );
         }
     }
-    if ($_POST['action'] == 'edit_request_certificate') {
+    if($_POST['action'] == 'edit_request_certificate') {
         $id = $_POST['id'];
         $arr_data = array(
             'email'             => addslashes($_POST['lname']),
@@ -849,7 +945,7 @@ if(isset($_POST['action'])){
             $cv++;
         }
 
-        $sql = "UPDATE user_profile SET " . $setValues . " WHERE id = $id";
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
         $result = $conn->query($sql);
         if (isset($result) == true) {
             $response = array(
@@ -867,7 +963,7 @@ if(isset($_POST['action'])){
             );
         }
     }
-    if ($_POST['action'] == 'delete_request_certificate') {
+    if($_POST['action'] == 'delete_request_certificate') {
         $id = $_POST['id'];
         $sql = "DELETE from certificates WHERE id = $id";
         $result = $conn->query($sql);
@@ -885,8 +981,235 @@ if(isset($_POST['action'])){
             );
         }
     }
+    if($_POST['action'] == 'process_request_certificate') {
+        $id = $_POST['id'];
+        $status = $_POST['status'];
+
+        switch ($status) {
+            case 'Pending':
+                $request_status = 'Processing';
+                $remarks = 'Process on going';
+                $html = 'Request is now on processing';
+                break;
+            case 'Processing':
+                $request_status = 'Pending';
+                $remarks = 'Returned to pending';
+                $html = 'Request returned to pending status';
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        $arr_data = array(
+            'request_status'    => $request_status,
+            'remarks'           => $remarks,
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => $html,
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'decline_request_certificate') {
+        $id = $_POST['id'];
+
+        $remarks = $_POST['remarks'];
+
+        $arr_data = array(
+            'request_status'    => 'Declined',
+            'remarks'           => $remarks,
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Declined!',
+                'html' => 'Certificate request has been declined!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'undo_request_certificate') {
+        $id = $_POST['id'];
+
+        $arr_data = array(
+            'request_status'    => 'Pending',
+            'remarks'           => 'Decline revert to pending',
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Certificate request has been revert to <b>PENDING</b> status!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'approve_request_certificate') {
+        $id = $_POST['id'];
+        $date = $_POST['date'];
+        $email = $_POST['email'];
+
+        $arr_data = array(
+            'request_status'    => 'For Claim',
+            'remarks'           => 'Claming Date : '.$date,
+            'claiming_date'     => $date,
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            //Fetch email notifications
+            $sql = "SELECT * FROM email_notification WHERE notification_for = 'Certificate Request'";
+            $result = $conn->query($sql);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            $subject = 'Barangay Certificate Request - Approved!';
+            $message = '<h4>'.$row['subject_title'].'</h4>
+                        <p>'.$row['message_content'].'</p>
+                        <p>Claiming Date : '.$date.'</p>';
+            sendEmail($email, $subject, $message);
+            $response = array(
+                'title' => 'Approved!',
+                'html' => 'Email notification sent. Claming date is on <b>'.$date.'</b>',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'claim_request_certificate') {
+        $id = $_POST['id'];
+        $email = $_POST['email'];
+
+        $arr_data = array(
+            'request_status'    => 'Completed',
+            'remarks'           => 'Successfully claimed!',
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+
+            // ADD EMAIL NOTIFICATION AUTOMAILER HERE
+            $subject = 'Barangay Certificate Request - Completed!';
+            $message = 'Your certificate request has been claimed on <b>'. $updated_at .'</b>';
+            sendEmail($email, $subject, $message);
+            
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Transaction request has been complete!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
 /** BARANGAY ID */
     if ($_POST['action'] == 'create_request_barangay_id') {
+        // Check if image file is actual file
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+            //get image file
+            $file = $_FILES['file']['tmp_name'];
+            $imageData = file_get_contents($file);
+            $base64 = base64_encode($imageData);
+            $imageType = $_FILES['file']['type']; // Get the image type
+            // Prepare the data URI
+            $dataUri = 'data:' . $imageType . ';base64,' . $base64;
+
+            // Create an image resource from the binary data
+            $image = imagecreatefromstring($imageData);
+            // Resize the image
+            $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+            // Encode the resized image back to Base64
+            ob_start();
+            imagejpeg($resizedImage);
+            // imagepng($resizedImage);
+            $imageBase64 = base64_encode(ob_get_contents());
+            ob_end_clean();
+            $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+        } else {
+            $dataUri = '';
+        }
 
         $fullname = $_POST['lname'] ? $_POST['lname'] . ', ' : '';
         $fullname .= $_POST['fname'] ? $_POST['fname'] . ' ' : '';
@@ -894,28 +1217,30 @@ if(isset($_POST['action'])){
         $fullname .= $_POST['suffix'] ? $_POST['suffix'] : '';
 
         $arr_data = array(
+            'photo'         => $dataUri,
+            'email'         => $user['email'],
             'fullname'      => $fullname,
             'bdate'         => $_POST['bdate'],
-            'gender'        => $_POST['gender'],
-            'civil_status'        => $_POST['civil_status'],
+            // 'gender'        => $_POST['gender'],
+            // 'civil_status'  => $_POST['civil_status'],
             'region'        => $_POST['region'],
-            'province'        => $_POST['province'],
-            'city'        => $_POST['city'],
-            'brgy'        => $_POST['brgy'],
+            'province'      => $_POST['province'],
+            'city'          => $_POST['city'],
+            'brgy'          => $_POST['brgy'],
             'street'        => $_POST['street'],
-            'contact_no'        => $_POST['contact_no'],
-            'tel_no'        => '',
-            'employers_name' => $_POST['emp_name'],
-            'lenght_stay_year' => $_POST['length_year'],
-            'lenght_stay_month' => $_POST['length_month'],
-            'fathers_name' => $_POST['fathers_name'],
-            'mothers_name' => $_POST['mothers_name'],
-            'emergency_person' => $_POST['emergency_person'],
-            'emergency_contact'          => $_POST['emergency_contact'],
+            // 'contact_no'    => $_POST['contact_no'],
+            // 'tel_no'        => '',
+            // 'employers_name' => '',
+            // 'lenght_stay_year'  => $_POST['length_year'],
+            // 'lenght_stay_month' => $_POST['length_month'],
+            // 'fathers_name'      => $_POST['fathers_name'],
+            // 'mothers_name'      => $_POST['mothers_name'],
+            'emergency_person'  => $_POST['emergency_person'],
+            'emergency_contact' => $_POST['emergency_contact'],
             'emergency_relationship'    => $_POST['emergency_relationship'],
             'emergency_address' => $_POST['emergency_address'],
-            'request_status' => 'Pending',
-            'is_active' => 1,        
+            'request_status'    => 'Pending',
+            // 'is_active' => 1,        
         );
 
         $columns = implode(",", array_keys($arr_data));
@@ -1113,6 +1438,225 @@ if(isset($_POST['action'])){
             'list_city' => $city,
             'list_brgy' => $brgy,
         );
+    }
+    if ($_POST['action'] == 'process_request_barangay_id') {
+        $id = $_POST['id'];
+        $status = $_POST['status'];
+
+        switch ($status) {
+            case 'Pending':
+                $request_status = 'Processing';
+                $remarks = 'Process on going';
+                $html = 'Request is now on processing';
+                break;
+            case 'Processing':
+                $request_status = 'Pending';
+                $remarks = 'Returned to pending';
+                $html = 'Request returned to pending status';
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        $arr_data = array(
+            'request_status'    => $request_status,
+            'remarks'           => $remarks,
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE barangay_id SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => $html,
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'decline_request_barangay_id') {
+        $id = $_POST['id'];
+        $remarks = $_POST['remarks'];
+
+        $arr_data = array(
+            'request_status'    => 'Declined',
+            'remarks'           => $remarks,
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE barangay_id SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Declined!',
+                'html' => 'Barangay ID request has been declined!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'undo_request_barangay_id') {
+        $id = $_POST['id'];
+
+        $arr_data = array(
+            'request_status'    => 'Pending',
+            'remarks'           => 'Decline revert to pending',
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE barangay_id SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Barangay ID request has been revert to <b>PENDING</b> status!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if ($_POST['action'] == 'approve_request_barangay_id') {
+        $id = $_POST['id'];
+        $date = $_POST['date'];
+        $email = $_POST['email'];
+
+        $sql = "SELECT * FROM email_notification WHERE notification_for = 'Barangay ID Request'";
+        $result = $conn->query($sql);
+        if($result->rowCount() > 0){
+            $result = $conn->query($sql);
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+
+            $email_subject = $row['subject_title'];
+            $email_message = $row['message_content'];
+
+            $arr_data = array(
+                'request_status'    => 'For Claim',
+                'remarks'           => 'Claming Date : ' . $date,
+                'claiming_date'     => $date,
+                'updated_at'        => $updated_at,
+            );
+
+            $cv = 0;
+            $setValues = '';
+            foreach ($arr_data as $index => $arr_data) {
+                $comma = ($cv > 0) ? ', ' : '';
+                $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+                $cv++;
+            }
+
+            $sql = "UPDATE barangay_id SET " . $setValues . " WHERE id = $id";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+
+                $subject = 'Barangay ID Request - Approved!';
+                $message = '<h4>' . $email_subject . '</h4>
+                        <p>' . $email_message . '</p>
+                        <p>Claiming Date : ' . $date . '</p>';
+
+                sendEmail($email, $subject, $message);
+                $response = array(
+                    'title' => 'Approved!',
+                    'html' => 'Email notification sent. Claming date is on <b>' . $date . '</b>',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
+        }else{
+            $response = array(
+                'title' => 'Create email notification',
+                'html' => 'Please setup email notification first!',
+                'icon' => 'info',
+            );
+        }
+
+       
+    }
+    if ($_POST['action'] == 'claim_request_barangay_id') {
+        $id = $_POST['id'];
+        $email = $_POST['email'];
+
+        $arr_data = array(
+            'request_status'    => 'Completed',
+            'remarks'           => 'Successfully claimed!',
+            'updated_at'        => $updated_at,
+        );
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE barangay_id SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+
+            // ADD EMAIL NOTIFICATION AUTOMAILER HERE
+            $email = 'oraclebasicsystem@gmail.com';
+            $subject = 'Barangay ID Request - Completed!';
+            $message = 'Your Barangay ID request has been claimed on <b>' . $updated_at . '</b>';
+            sendEmail($email, $subject, $message);
+
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Transaction request has been complete!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
     }
 /** OFFICIALS */
     if ($_POST['action'] == 'create_official') {
@@ -1346,9 +1890,8 @@ if(isset($_POST['action'])){
     }
 /** USER ACCOUNTS */
     if ($_POST['action'] == 'create_account') {
-
         $arr_data = array(
-            'email'             => addslashes($_POST['lname']),
+            'email'             => addslashes($_POST['email']),
             'pass'              => password_hash(addslashes($_POST['pass']), PASSWORD_BCRYPT),
             'activation_code'   => '',
             'is_active'         => 0,
@@ -1363,14 +1906,12 @@ if(isset($_POST['action'])){
         $result = $conn->query($sql);
         if (isset($result) == true) {
             $response = array(
-                'status' => 'ok',
                 'title' => 'Success!',
                 'html' => 'Account has been added!',
                 'icon' => 'success',
             );
         } else {
             $response = array(
-                'status' => 'error',
                 'title' => 'Error!',
                 'html' => 'Please try again later!',
                 'icon' => 'error',
@@ -1479,21 +2020,57 @@ if(isset($_POST['action'])){
     }
 /** SETTINGS */
     if ($_POST['action'] == 'update_settings') {
-        $result = $conn->query("TRUNCATE TABLE settings;");
+        $result = $conn->query("TRUNCATE TABLE settings;");    
         if (isset($result) == true) {
-            //get image file
-            $file = $_FILES['file']['tmp_name'];
-            $imageData = file_get_contents($file);
-            $base64 = base64_encode($imageData);
-            $imageType = $_FILES['file']['type']; // Get the image type
+            if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+                //get image file
+                $file = $_FILES['file']['tmp_name'];
+                $imageData = file_get_contents($file);
+                $base64 = base64_encode($imageData);
+                $imageType = $_FILES['file']['type']; // Get the image type
+                // Prepare the data URI
+                $dataUri = 'data:' . $imageType . ';base64,' . $base64;
 
-            // Prepare the data URI
-            $dataUri = 'data:' . $imageType . ';base64,' . $base64;
+                // Create an image resource from the binary data
+                $image = imagecreatefromstring($imageData);
+                // Resize the image
+                $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+                // Encode the resized image back to Base64
+                ob_start();
 
-            $arr_data = array(
-                'sys_name'   => addslashes($_POST['sys_name']),
-                'logo'      => $dataUri
-            );
+                switch ($imageType) {
+                    case 'image/png':
+                        imagepng($resizedImage);
+                        break;
+                    
+                    default:
+                        imagejpeg($resizedImage);
+                        break;
+                }                
+                
+                $imageBase64 = base64_encode(ob_get_contents());
+                ob_end_clean();
+                $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+
+                $arr_data = array(
+                    'sys_name'  => addslashes($_POST['sys_name']),
+                    'vision'    => addslashes($_POST['vision']),
+                    'mission'   => addslashes($_POST['mission']),
+                    'address'   => addslashes($_POST['mission']),
+                    'contact'   => $_POST['contact'],
+                    'email'     => $_POST['email'],
+                    'logo'      => $dataUri
+                );
+            } else {
+                $arr_data = array(
+                    'sys_name'  => addslashes($_POST['sys_name']),
+                    'vision'    => addslashes($_POST['vision']),
+                    'mission'   => addslashes($_POST['mission']),
+                    'address'   => addslashes($_POST['mission']),
+                    'contact'   => $_POST['contact'],
+                    'email'     => $_POST['email'],
+                );
+            }
 
             $columns = implode(",", array_keys($arr_data));
             $values = implode("','", array_values($arr_data));
@@ -1502,14 +2079,51 @@ if(isset($_POST['action'])){
             $result = $conn->query($sql);
             if (isset($result) == true) {
                 $response = array(
-                    'status' => 'ok',
                     'title' => 'Success!',
                     'html' => 'Settings has been updated!',
                     'icon' => 'success',
                 );
             } else {
                 $response = array(
-                    'status' => 'error',
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
+
+            
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Failed to truncate table, please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+/** EMAIL NOTIFICATION */
+    if ($_POST['action'] == 'email_notification') {
+        $result = $conn->query("TRUNCATE TABLE email_notification;");        
+
+        if (isset($result) == true) {
+            $arr_data = array(
+                'notification_for'  => $_POST['type'],
+                'subject_title'     => $_POST['subject_title'],
+                'message_content'   => $_POST['message_content'],
+            );          
+
+            $columns = implode(",", array_keys($arr_data));
+            $values = implode("','", array_values($arr_data));
+
+            $sql = "INSERT INTO email_notification ($columns) VALUES ('$values')";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'Email notifications has been updated!',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
                     'title' => 'Error!',
                     'html' => 'Please try again later!',
                     'icon' => 'error',
@@ -1622,6 +2236,13 @@ if(isset($_POST['fetch'])){
                             <div class="custom-control custom-radio m-2">
                                 <input class="custom-control-input" type="radio" id="purpose5" name="purpose" value="First Time Jobseekers Assistance Act (RA 11261)" required>
                                 <label for="purpose5" class="custom-control-label">First Time Jobseekers Assistance Act (RA 11261)</label>
+                            </div>
+                            <div class="row pl-2">
+                                <div class="custom-control custom-radio m-2">
+                                    <input class="custom-control-input" type="radio" id="purpose6" name="purpose" value="Others" required>
+                                    <label for="purpose6" class="custom-control-label">Others</label>
+                                </div>
+                                <input type="text" class="form-control col-sm-6" name="specify" id="specify" placeholder="Please specify if others." disabled>
                             </div>';
                 break;
             case 'Certificate of Indigency':
@@ -1648,6 +2269,13 @@ if(isset($_POST['fetch'])){
                             <div class="custom-control custom-radio m-2">
                                 <input class="custom-control-input" type="radio" id="purpose6" name="purpose" value="Burial/Financial Assistance" required>
                                 <label for="purpose6" class="custom-control-label">Burial/Financial Assistance</label>
+                            </div>
+                            <div class="row pl-2">
+                                <div class="custom-control custom-radio m-2">
+                                    <input class="custom-control-input" type="radio" id="purpose7" name="purpose" value="Others" required>
+                                    <label for="purpose7" class="custom-control-label">Others</label>
+                                </div>
+                                <input type="text" class="form-control col-sm-6" name="specify" id="specify" placeholder="Please specify if others." disabled>
                             </div>';
                 break;
             case 'Certificate of Residency':
@@ -1794,6 +2422,93 @@ if(isset($_POST['fetch'])){
         }
 
         echo json_encode($response);
+    }
+    if($_POST['fetch'] == 'email_notification'){
+        $type = $_POST['type'];
+        $sql = "SELECT *
+                FROM email_notification
+                WHERE notification_for = '$type'";
+        $result = $conn->query($sql);
+        if($result->rowCount() > 0){
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            $response = array(
+                'subject_title' => $row['subject_title'],
+                'message_content' => $row['message_content'],
+            );
+        }else{
+            $response = 'No email notification data found!';
+        }
+
+        echo json_encode($response);
+    }
+}
+
+//Generate OTP
+function pincode(){
+    $pin = mt_rand(0000, 9999);
+    return $pin;
+}
+//SEND EMAIL NOTIFICATION
+function sendEmail($email, $subject, $message){
+    //Send Verification Email
+    $mail = new PHPMailer();
+    // SERVER SETTINGS
+    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+    $mail->IsSMTP();
+    $mail->CharSet    = "utf-8";
+    $mail->SMTPAuth   = true;
+    $mail->SMTPSecure = "ssl";
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = "465";
+
+    $mail->Host       = "mail.placer8developer.com";
+    $mail->Username   = "noreply@placer8portal.com";
+    $mail->Password   = "noreply@placer8portal.com";
+    $mail->From       = 'noreply@placer8portal.com';
+    $mail->FromName   = 'BMI-EIRS SYSTEM';
+
+    // RECIPIENTS
+    $mail->addAddress($email);
+    /*--- Subject ---*/
+    $mail->Subject    = $subject;
+    $mail->isHTML(true);
+    $mail->Body = $message;
+
+    try {
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        echo "Mailer Error: " . $mail->ErrorInfo;
+    }
+}
+
+function sendOTP($email, $subject){
+    //Send Verification Email
+    $mail = new PHPMailer();
+    $mail->CharSet    = "utf-8";
+    $mail->IsSMTP();
+    $mail->SMTPAuth   = true;
+    $mail->SMTPSecure = "ssl";
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = "465";
+
+    /*Webhosting*/
+    $mail->Host       = "mail.placer8developer.com";
+    $mail->Username   = "noreply@placer8portal.com";
+    $mail->Password   = "noreply@placer8portal.com";
+    $mail->From       = 'noreply@placer8portal.com';
+    $mail->FromName   = 'BMI-EIRS SYSTEM';
+
+    $mail->addAddress($email);
+    $mail->Subject    = $subject;
+    $mail->isHTML(true);
+    $mail->Body = 'This is auto generated by BMIS-EIRS system.';
+
+    try {
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        echo "Mailer Error: " . $mail->ErrorInfo;
     }
 }
 ?>

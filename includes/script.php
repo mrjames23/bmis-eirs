@@ -28,6 +28,12 @@
     <!-- Data Tables -->
     <script src="<?= ASSETS ?>/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="<?= ASSETS ?>/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <!-- InputMask -->
+    <script src="<?= ASSETS ?>/plugins/moment/moment.min.js"></script>
+    <script src="<?= ASSETS ?>/plugins/inputmask/jquery.inputmask.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="<?= ASSETS ?>/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="<?= ASSETS ?>/plugins/jquery-validation/additional-methods.min.js"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
     <script>
         $.widget.bridge('uibutton', $.ui.button)
@@ -56,5 +62,7 @@
                 'autoWidth': false,
                 'scrollX': true,
             });
+            //Money Euro
+            $('[data-mask]').inputmask()
         })
     </script>

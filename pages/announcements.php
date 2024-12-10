@@ -16,7 +16,7 @@ include_once('session.php');
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h1 class="card-title">Announcements</h1>
+                            <h1 class="card-title">Events & Announcements</h1>
                             <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
                                 <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                     <i class="fa fa-plus"></i> CREATE
@@ -34,7 +34,7 @@ include_once('session.php');
                             <?php
                             switch ($user['user_type']) {
                                 case 'ADMIN':
-                                    $sql = "SELECT * FROM announcement ORDER BY created_at DESC";     
+                                    $sql = "SELECT * FROM announcement ORDER BY created_at DESC";
                                     break;
 
                                 default:
@@ -47,7 +47,7 @@ include_once('session.php');
                             if ($result->rowCount() > 0) {
                                 foreach ($result as $row) {
 
-                                    if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') {
+                                    if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') {
                                         switch ($row['is_published']) {
                                             case 1:
                                                 $is_published = 'checked';
@@ -65,12 +65,12 @@ include_once('session.php');
                                                         <button type="button" class="btn btn-sm btn-danger delete" id="' . $row['id'] . '" data-id="' . $row['news_title'] . '">
                                                             <i class="fa fa-trash"></i>&nbsp;Delete
                                                         </button>';
-                                    }else{
+                                    } else {
                                         $btn_published = '<label for="publish">Published</label>';
                                         $btn_action    = '';
                                     }
 
-                                    
+
                                     echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch" id="news_data">
                                                 <div class="card bg-light d-flex flex-fill">
                                                     <div class="card-header text-muted border-bottom-0">
@@ -90,42 +90,17 @@ include_once('session.php');
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer justify-content-between">
-                                                        <div>'. $btn_published.'</div>
-                                                        <div>'. $btn_action.'</div>
+                                                        <div>' . $btn_published . '</div>
+                                                        <div>' . $btn_action . '</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         ';
                                 }
                             } else {
-                                echo '<div class="col-12 col-sm-12 col-md-12 col-lg-6 d-flex align-items-stretch">
-                                            <div class="card bg-light d-flex flex-fill">
-                                                <div class="card-header text-muted border-bottom-0">
-                                                    Date : Dec 25, 2024
-                                                </div>
-                                                <div class="card-body pt-0">
-                                                    <div class="row">
-                                                        <div class="col-5 text-center">
-                                                            <img src="../images/logo.png" alt="image" class="img-square img-fluid">
-                                                        </div>
-                                                        <div class="col-7">
-                                                            <h2 class="lead"><b>News Title (Sample Only)</b></h2>
-                                                            <p class="text-muted text-sm">This is sample content only...</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer justify-content-between">
-                                                    <div>
-                                                        <label for="publish">Publish&nbsp;</label>
-                                                        <input type="checkbox" name="publish" id="publish" data-bootstrap-switch data-on-color="success">
-                                                    </div>
-                                                    <div>
-                                                        <button type="button" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i>&nbsp;Edit</button>
-                                                        <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i>&nbsp;Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>';
+                                echo '<div class="m-5">
+                                        <h3 class="text-center">No news or announcements found!</h3>
+                                    </div>';
                             }
                             ?>
                         </div>
@@ -309,22 +284,9 @@ include_once('session.php');
                 });
 
             });
-
-            // getAnnouncements()
+            $('#modal').on('hidden.bs.modal', function() {
+                // Reset the form fields
+                $('#form1')[0].reset();
+            });
         })
     </script>
-    <!-- <script>
-        function getAnnouncements() {
-            $.ajax({
-                type: "post",
-                url: "ajax",
-                data: {
-                    fetch: 'announcements'
-                },
-                dataType: "json",
-                success: function(response) {
-                    $('.content #announcements').html(response)
-                }
-            });
-        }
-    </script> -->

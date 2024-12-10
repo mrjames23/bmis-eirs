@@ -18,18 +18,18 @@
                         </div>
                         <div class="form-group">
                             <label for="fname">Password</label>
-                            <input type="text" class="form-control" name="pass" id="pass" required />
+                            <input type="password" class="form-control" name="pass" id="pass" required />
                         </div>
                         <div class="form-group">
                             <label for="mname">Confirm Password</label>
-                            <input type="text" class="form-control" name="pass2" id="pass2" required />
+                            <input type="password" class="form-control" name="pass2" id="pass2" required />
                         </div>
                         <div class="form-group">
                             <label for="access_type">User Type</label>
                             <select class="form-control" name="user_type" id="user_type" style="width: 100%" required>
                                 <option value="" selected="selected" hidden disabled>Select User Type</option>
                                 <option value="ADMIN">ADMIN</option>
-                                <option value="USER">STAFF</option>
+                                <option value="STAFF">STAFF</option>
                                 <option value="USER">USER</option>
                             </select>
                         </div>

@@ -42,12 +42,12 @@ include_once('session.php');
                                                 <th style="width: 1%">#</th>
                                                 <th style="width: 5%">PHOTO</th>
                                                 <th style="width: 20%">FULL NAME</th>
-                                                <th style="width: 20%">NATIONAL ID</th>
+                                                <th style="width: 20%">BARANGAY ID</th>
                                                 <th style="width: 20%">AGE</th>
                                                 <th style="width: 20%">GENDER</th>
                                                 <th style="width: 20%">CIVIL STATUS</th>
                                                 <th style="width: 20%">CONTACT #</th>
-                                                <th style="width: 20%">VOTER STATUS</th>
+                                                <th style="width: 20%">BRGY STATUS</th>
                                                 <th style="width: 20%">ACTION</th>
                                             </tr>
                                         </thead>
@@ -77,6 +77,7 @@ include_once('session.php');
                 reader.readAsDataURL(input.files[0]);
             } else {
                 $('.img-content').attr('src', '../images/upload_image.png');
+                $('#modal #file').prop('required', 1)
             }
         }
 
@@ -84,6 +85,7 @@ include_once('session.php');
         const stepper = new Stepper(document.querySelector('#stepper'), {
             linear: true,
             animation: true,
+
         });
 
         function nextStep(currentStep) {
@@ -146,7 +148,7 @@ include_once('session.php');
                             loading()
                         },
                         success: function(response) {
-                            if (response.status == 'ok') {
+                            if (response.icon == 'success') {
                                 $('#modal').modal('hide')
                                 $('#modal form').trigger('reset')
                                 Swal.fire({
@@ -167,7 +169,7 @@ include_once('session.php');
                                 })
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function() {
                             error()
                         }
                     });
@@ -192,10 +194,121 @@ include_once('session.php');
                 }
             });
         }
+        // Submit census form
+        $(document).on('submit', '#form_census', function(e) {
+            e.preventDefault()
+            var data = new FormData($(this)[0])
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: data,
+                dataType: "json",
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    loading()
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: response.title,
+                        text: response.text,
+                        html: response.html,
+                        icon: response.icon,
+                        allowOutsideClick: false,
+                    })
+                    table.ajax.reload(null, false)
+                },
+                error: function() {
+                    error()
+                }
+            });
+        });
         // Show add record modal
         $(document).on('click', '.create', function() {
             $('#modal #action').val('create_user_profile')
+            $('#modal .modal-title').html('<li class="fa fa-user"></li> Add Record')
             $('#modal .img-content').attr('src', '../images/upload_image.png');
+        });
+        // Show modal census
+        $(document).on('click', '.census', function() {
+            var id = $(this).attr('id')
+            $.ajax({
+                type: "post",
+                url: "ajax",
+                data: {
+                    action: 'fetch_user_census',
+                    id: id
+                },
+                dataType: "json",
+                beforeSend: function() {
+                    loading()
+                },
+                success: function(response) {
+                    Swal.close()
+                    $('#modal_census').modal('show')
+                    $('#modal_census #id').val(id)
+                    $('#modal_census #action').val('edit_user_census')
+                    $('#modal_census .modal-title').html('<li class="fa fa-list"></li> Profile Record')
+                    //Personal Information
+                    $('#modal_census .profile-user-img').attr('src', response.image);
+                    $('#modal_census #fullname').html(response.fullname)
+                    $('#modal_census #gender').html(response.gender)
+                    $('#modal_census #bdate').html(response.bdate)
+                    $('#modal_census #civil_status').html(response.civil_status)
+                    $('#modal_census #citizenship').html(response.citizenship)
+                    $('#modal_census #voter_status').html(response.voter_status)
+                    $('#modal_census #contact_no').html(response.contact_no)
+                    $('#modal_census #email').html(response.email)
+                    $('#modal_census #birth_place').html(response.birth_place)
+                    $('#modal_census #address').html(response.address)
+                    // Census Data
+                    $('#modal_census #provincial_address').val(response.provincial_address)
+                    $('#modal_census #household_type').val(response.household_type)
+                    $('#modal_census #member_count').val(response.member_count)
+                    $('#modal_census #educational_attainment').val(response.educational_attainment)
+                    $('#modal_census #employment_status').val(response.employment_status)
+                    $('#modal_census #is_philhealth').val(response.is_philhealth)
+                    $('#modal_census #is_covid_vacinated').val(response.is_covid_vacinated)
+                    $('#modal_census #is_pwd').val(response.is_pwd)
+                    $('#modal_census #with_pwd_id').val(response.with_pwd_id)
+                    $('#modal_census #disability_type').val(response.disability_type)
+                    $('#modal_census #is_solo_parent').val(response.is_solo_parent)
+                    $('#modal_census #solo_parent_reason').val(response.solo_parent_reason)
+                    $('#modal_census #with_solo_parent_id').val(response.with_solo_parent_id)
+                    $('#modal_census #child_vaccine_completed').val(response.child_vaccine_completed)
+                    $('#modal_census #immunization_card_img').val(response.immunization_card_img) //IMAGE <-----
+                    $('#modal_census #child_vaccine_location').val(response.child_vaccine_location)
+                    $('#modal_census #below_17_napurga').val(response.below_17_napurga)
+                    $('#modal_census #when_napurga').val(response.when_napurga)
+                    $('#modal_census #where_napurga').val(response.where_napurga)
+                    $('#modal_census #is_breast_feeding_below_sixmonths').val(response.is_breast_feeding_below_sixmonths)
+                    $('#modal_census #is_pregnant').val(response.is_pregnant)
+                    $('#modal_census #last_period').val(response.last_period)
+                    $('#modal_census #due_date_birth').val(response.due_date_birth)
+                    $('#modal_census #is_prenatal_checkup').val(response.is_prenatal_checkup)
+                    $('#modal_census #where_prenatal').val(response.where_prenatal)
+                    $('#modal_census #is_breastfeeding').val(response.is_breastfeeding)
+                    $('#modal_census #month_of_child_breastfeed').val(response.month_of_child_breastfeed)
+                    $('#modal_census #use_contraceptives').val(response.use_contraceptives)
+                    $('#modal_census #what_contraceptive').val(response.what_contraceptive)
+                    $('#modal_census #where_contraceptive').val(response.where_contraceptive)
+                    $('#modal_census #house_type').val(response.house_type)
+                    $('#modal_census #business_type').val(response.business_type)
+                    $('#modal_census #house_materials').val(response.house_materials)
+                    $('#modal_census #years_stay_manila').val(response.years_stay_manila)
+                    $('#modal_census #months_stay_manila').val(response.months_stay_manila)
+                    $('#modal_census #residential_status').val(response.residential_status)
+                    $('#modal_census #water_source').val(response.water_source)
+                    $('#modal_census #palikuran').val(response.palikuran)
+
+
+                },
+                error: function() {
+                    error()
+                }
+            });
+
         });
         // Fetch and edit announcement on modal show
         $(document).on('click', '.edit', function() {
@@ -214,8 +327,10 @@ include_once('session.php');
                 success: function(response) {
                     Swal.close();
                     $('#modal').modal('show')
+                    $('#modal .modal-title').html('<li class="fa fa-edit"></li> Edit Record')
                     $('#modal #id').val(response.id)
                     $('#modal .img-content').attr('src', response.image);
+                    $('#modal #file').prop('required', 0)
                     $('#modal #lname').val(response.lname)
                     $('#modal #fname').val(response.fname)
                     $('#modal #mname').val(response.mname)
@@ -353,6 +468,11 @@ include_once('session.php');
             //Reset validation
             $('[name="contact_no"]').removeClass('is-invalid')
             $('[name="contact_no"]').removeClass('is-valid')
+        });
+        // Reset Modal Census on modal close
+        $('#modal_census').on('hidden.bs.modal', function() {
+            // Reset the form fields
+            $('#form_census')[0].reset();
         });
         //validate Contact No via keypress
         $(document).on('change keypress', '[name="contact_no"]', function(e) {

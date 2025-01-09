@@ -286,7 +286,7 @@ include_once('session.php');
             });
             $('#modal').on('hidden.bs.modal', function() {
                 // Reset the form fields
-                $('#form1')[0].reset();
+                $('#form')[0].reset();
             });
         })
     </script>

@@ -85,6 +85,7 @@ try {
     $conn->exec("CREATE TABLE IF NOT EXISTS user_profile (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                brgy_id VARCHAR(255) DEFAULT NULL,
                 lname VARCHAR(255) DEFAULT NULL,
                 fname TEXT DEFAULT NULL,
                 mname TEXT DEFAULT NULL,
@@ -106,7 +107,52 @@ try {
                 photo LONGBLOB DEFAULT NULL,
                 updated_at TEXT DEFAULT NULL,
                 updated_by TEXT DEFAULT NULL,
-                INDEX (lname)
+                INDEX (brgy_id)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
+    $conn->exec("CREATE TABLE IF NOT EXISTS user_census (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                user_profile_id VARCHAR(255) DEFAULT NULL,
+                provincial_address VARCHAR(255) DEFAULT NULL,
+                household_type TEXT DEFAULT NULL,
+                member_count TEXT DEFAULT NULL,
+                educational_attainment TEXT DEFAULT NULL,
+                employment_status TEXT DEFAULT NULL,
+                is_philhealth TEXT DEFAULT NULL,
+                is_covid_vacinated TEXT DEFAULT NULL,
+                is_pwd TEXT DEFAULT NULL,
+                with_pwd_id TEXT DEFAULT NULL,
+                disability_type TEXT DEFAULT NULL,
+                is_solo_parent TEXT DEFAULT NULL,
+                solo_parent_reason TEXT DEFAULT NULL,
+                with_solo_parent_id TEXT DEFAULT NULL,
+                child_vaccine_completed TEXT DEFAULT NULL,
+                immunization_card_img LONGBLOB DEFAULT NULL,
+                child_vaccine_location TEXT DEFAULT NULL,
+                below_17_napurga TEXT DEFAULT NULL,
+                when_napurga TEXT DEFAULT NULL,
+                where_napurga TEXT DEFAULT NULL,
+                is_breast_feeding_below_sixmonths TEXT DEFAULT NULL,
+                is_pregnant TEXT DEFAULT NULL,
+                last_period TEXT DEFAULT NULL,
+                due_date_birth TEXT DEFAULT NULL,
+                is_prenatal_checkup TEXT DEFAULT NULL,
+                where_prenatal TEXT DEFAULT NULL,
+                is_breastfeeding TEXT DEFAULT NULL,
+                month_of_child_breastfeed TEXT DEFAULT NULL,
+                use_contraceptives TEXT DEFAULT NULL,
+                what_contraceptive TEXT DEFAULT NULL,
+                where_contraceptive TEXT DEFAULT NULL,
+                house_type TEXT DEFAULT NULL,
+                business_type TEXT DEFAULT NULL,
+                house_materials TEXT DEFAULT NULL,
+                years_stay_manila TEXT DEFAULT NULL,
+                months_stay_manila TEXT DEFAULT NULL,
+                residential_status TEXT DEFAULT NULL,
+                water_source TEXT DEFAULT NULL,
+                palikuran TEXT DEFAULT NULL,
+                INDEX (user_profile_id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
 /** CERTIFICATES */
@@ -133,25 +179,13 @@ try {
 /** BARANGAY ID */
     $conn->exec("CREATE TABLE IF NOT EXISTS barangay_id (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                
+                id_no VARCHAR(255) DEFAULT NULL,
+                brgy_id VARCHAR(255) DEFAULT NULL,
                 photo LONGBLOB DEFAULT NULL,
                 email VARCHAR(255) DEFAULT NULL,
                 fullname TEXT DEFAULT NULL,
                 bdate TEXT DEFAULT NULL,
-                gender TEXT DEFAULT NULL,
-                civil_status TEXT DEFAULT NULL,
-                region TEXT DEFAULT NULL,
-                province TEXT DEFAULT NULL,
-                city TEXT DEFAULT NULL,
-                brgy TEXT DEFAULT NULL,
-                street TEXT DEFAULT NULL,
-                contact_no TEXT DEFAULT NULL,
-                tel_no TEXT DEFAULT NULL,
-                employers_name TEXT DEFAULT NULL,
-                lenght_stay_year TEXT DEFAULT NULL,
-                lenght_stay_month TEXT DEFAULT NULL,
-                fathers_name TEXT DEFAULT NULL,
-                mothers_name TEXT DEFAULT NULL,
                 emergency_person TEXT DEFAULT NULL,
                 emergency_contact TEXT DEFAULT NULL,
                 emergency_relationship TEXT DEFAULT NULL,
@@ -159,8 +193,9 @@ try {
                 request_status TEXT DEFAULT NULL,
                 remarks TEXT DEFAULT NULL,
                 claiming_date TEXT DEFAULT NULL,                
+                expiration_date TEXT DEFAULT NULL,                
                 updated_at TEXT DEFAULT NULL,                
-                INDEX (fullname)
+                INDEX (email,id_no,brgy_id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
 /** SETTINGS */
@@ -209,8 +244,11 @@ try {
                 INDEX (id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
-/** REGION CITY STREET */
-    include_once('region_city.php');
+/** REGION/PROVINCE/CITY/BRGY */
+    include_once('refregion.php');
+    include_once('refprovince.php');
+    include_once('refcitymun.php');
+    include_once('refbrgy.php');
 
 } catch (PDOException $e) {
     echo "Connection failed : " . $e->getMessage();

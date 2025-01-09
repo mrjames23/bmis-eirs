@@ -47,7 +47,7 @@
                     </li>
                     <li class="nav-header">EQUIPMENT RESERVATIONS</li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="dashboard.php" class="nav-link">
                             <i class="nav-icon fa fa-tachometer-alt"></i>
                             <p>
                                 Dashboard
@@ -172,7 +172,7 @@
                     </li>
                     <!-- <li class="nav-header">EQUIPMENT RESERVATIONS</li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="dashboard.php" class="nav-link">
                             <i class="nav-icon fa fa-tachometer-alt"></i>
                             <p>
                                 Dashboard
@@ -258,7 +258,7 @@
                     </li>
                     <!-- <li class="nav-header">EQUIPMENT RESERVATIONS</li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="dashboard.php" class="nav-link">
                             <i class="nav-icon fa fa-tachometer-alt"></i>
                             <p>
                                 Dashboard

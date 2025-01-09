@@ -1,6 +1,7 @@
 <?php
 include_once('session.php');
 $updated_at = date('Y-m-d H:i:s');
+$serial_no = time() . rand(100, 999);
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -76,8 +77,6 @@ if(isset($_POST['table'])){
         $result = $conn->query($sql);
         $count = 1;
         foreach ($result as $row) {
-
-
             //Get User Image
             $image = $row['photo'] ? $row['photo'] : '../images/avatar.png';
             $image = '<ul class="list-inline">
@@ -109,35 +108,64 @@ if(isset($_POST['table'])){
             // Action Buttons
             $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['id'] . '"  data-val="' . strtoupper($fullname) . '">
                         <i class="fa fa-edit"></i>&nbsp;Edit
-                    </button>';
+                    </button>&nbsp;';
             $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['id'] . '" data-val="' . strtoupper($fullname) . '">
                         <i class="fa fa-trash"></i>&nbsp;Delete
-                    </button>';
-            $view = "";
+                    </button>&nbsp;';
+            $census = '<button type="button" class="btn btn-info btn-sm census" id="' . $row['id'] . '"  data-val="' . strtoupper($fullname) . '">
+                        <i class="fa fa-search"></i>&nbsp;Census
+                    </button>&nbsp;';
+
+            // Define action buttons via user type
+            switch ($user['user_type']) {
+                case 'ADMIN':
+                    $action = $census . $edit . $delete;
+                    break;
+                case 'STAFF':
+                    $action = $census . $edit;
+                    break;
+                default:
+                    $action = '';
+                    break;
+            }
 
             $sub_array = array();
             $sub_array[] = $count++ . '.';
             $sub_array[] = $image;
             $sub_array[] = strtoupper($fullname);
-            $sub_array[] = '';
+            $sub_array[] = $row['brgy_id'];
             $sub_array[] = $age;
             $sub_array[] = $row['gender'];
             $sub_array[] = $row['civil_status'];
             $sub_array[] = $row['contact_no'];
             $sub_array[] = $voters_status;
-            $sub_array[] = $edit.'&nbsp;'.$delete;
+            $sub_array[] = $action;
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
     }
     if($_POST['table'] == 'certificates') {
         if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){
-            $sql = "SELECT * FROM certificates";
+            switch ($_POST['filter']) {
+                case '':
+                    $filter = '';
+                    break;
+                default:
+                    $filter = "WHERE cert_type = '{$_POST['filter']}'";
+                    break;
+            }
+            $sql = "SELECT * FROM certificates $filter";
         }else{
-            $sql = "SELECT * FROM certificates WHERE email = '{$user['email']}'";
-        }
-
-        
+            switch ($_POST['filter']) {
+                case '':
+                    $filter = '';
+                    break;
+                default:
+                    $filter = "AND cert_type = '{$_POST['filter']}'";
+                    break;
+            }
+            $sql = "SELECT * FROM certificates WHERE email = '{$user['email']}' $filter";
+        }        
         $result = $conn->query($sql);
         $count = 1;
         foreach ($result as $row) {
@@ -152,7 +180,7 @@ if(isset($_POST['table'])){
                         <i class="fa fa-thumbs-down"></i>&nbsp;Decline
                     </button>&nbsp;';
             $claim = '<button type="button" class="btn btn-success btn-sm claim" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="' . $row['email'] . '">
-                        <i class="fa fa-check"></i>&nbsp;Claim
+                        <i class="fa fa-check"></i>&nbsp;Complete
                     </button>&nbsp;';
             $undo = '<button type="button" class="btn btn-secondary btn-sm undo" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
                         <i class="fa fa-history"></i>&nbsp;Revert
@@ -190,14 +218,22 @@ if(isset($_POST['table'])){
                 default:
                     $status = '<span class="badge badge-success rounded-lg p-2">' . strtoupper($row['request_status']) . '</span>';
                     $process = '<span class="text-success">COMPLETED&nbsp;<span>';
-                    $action = '';
                     $undo = $undo;
+                    if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') {
+                        $action = '&nbsp;
+                                <a href="print.php?data=' . $row['id'] . '" class="btn btn-default btn-sm print" target="_blank"  id="' . $row['id'] . '"  data-id="' . $row['id'] . '">
+                                    <i class="fa fa-print"></i>&nbsp;Print
+                                </a>';
+                    } else {
+                        $action = '';
+                    }                  
+                    
                     break;
             }
             // Define action buttons via user type
             switch ($user['user_type']) {
                 case 'ADMIN':
-                    $action = $process. $action. $undo. $delete;
+                    $action = $process. $action;
                     break;
                 case 'STAFF':
                     $action = $process . $action;
@@ -211,7 +247,7 @@ if(isset($_POST['table'])){
             $sub_array[] = $count++ . '.';
             $sub_array[] = $status;
             $sub_array[] = $row['created_at'];
-            $sub_array[] = $row['fullname'];
+            $sub_array[] = $row['fullname'] ? $row['fullname'] : $row['email'];
             $sub_array[] = $row['cert_type'];
             $sub_array[] = $row['cert_purpose'];
             $sub_array[] = $row['remarks'];
@@ -229,7 +265,7 @@ if(isset($_POST['table'])){
         }
         
         $result = $conn->query($sql);
-        $count = 1;
+        // $count = 1;
         foreach ($result as $row) {
             // Action Buttons
             $delete = '<button type="button" class="btn btn-outline-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
@@ -242,7 +278,7 @@ if(isset($_POST['table'])){
                         <i class="fa fa-thumbs-down"></i>&nbsp;Decline
                     </button>&nbsp;';
             $claim = '<button type="button" class="btn btn-success btn-sm claim" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '" data-val="' . $row['email'] . '">
-                        <i class="fa fa-check"></i>&nbsp;Claim
+                        <i class="fa fa-check"></i>&nbsp;Complete
                     </button>&nbsp;';
             $undo = '<button type="button" class="btn btn-secondary btn-sm undo" id="' . $row['id'] . '" data-id="' . $row['fullname']  . '">
                         <i class="fa fa-history"></i>&nbsp;Revert
@@ -287,7 +323,7 @@ if(isset($_POST['table'])){
             // Define action buttons via user type
             switch ($user['user_type']) {
                 case 'ADMIN':
-                    $action = $process . $action . $undo . $delete;
+                    $action = $process . $action;
                     break;
                 case 'STAFF':
                     $action = $process . $action;
@@ -295,27 +331,7 @@ if(isset($_POST['table'])){
                 default:
                     $action = '';
                     break;
-            }
-
-            if($row['province']){
-                $sql = "SELECT provDesc FROM refprovince WHERE provCode = ".$row['province'];
-                $result = $conn->query($sql);
-                $address = $result->fetch(PDO::FETCH_ASSOC);
-                $province = $address['provDesc'];
-            }
-            if($row['city']){
-                $sql = "SELECT citymunDesc FROM refcitymun WHERE citymunCode = ".$row['city'];
-                $result = $conn->query($sql);
-                $address = $result->fetch(PDO::FETCH_ASSOC);
-                $city = $address['citymunDesc'];
-            }
-            if($row['brgy']){
-                $sql = "SELECT brgyDesc FROM refbrgy WHERE brgyCode = ".$row['brgy'];
-                $result = $conn->query($sql);
-                $address = $result->fetch(PDO::FETCH_ASSOC);
-                $brgy = $address['brgyDesc'];
-            }
-            $address = $row['street'].', '. $brgy.' '.$city.', '.$province;
+            }          
 
             $image = $row['photo'] ? $row['photo'] : '../images/avatar.png';
             $fullname = '<ul class="list-inline">
@@ -326,16 +342,18 @@ if(isset($_POST['table'])){
                     </ul>';
 
             $sub_array = array();
-            $sub_array[] = $count++ . '.';
-            $sub_array[] = $status;
+            $sub_array[] = $status;            
             $sub_array[] = $row['created_at'];
+            $sub_array[] = $row['id_no'];
             $sub_array[] = $fullname;
             $sub_array[] = $row['bdate'];
-            $sub_array[] = $address;
             $sub_array[] = $row['emergency_person'];
             $sub_array[] = $row['emergency_relationship'];
             $sub_array[] = $row['emergency_address'];
             $sub_array[] = $row['emergency_contact'];
+            $sub_array[] = $row['claiming_date'];
+            $sub_array[] = $row['expiration_date'];
+            $sub_array[] = $row['remarks'];
             $sub_array[] = '<div class="text-right">'.$action.'</div>';
             $data[] = $sub_array;
         }
@@ -383,7 +401,9 @@ if(isset($_POST['table'])){
             $delete = '<button type="button" class="btn btn-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['position_name']  . '">
                         <i class="fa fa-trash"></i>&nbsp;Delete
                     </button>&nbsp;';
-            $view = "";
+            $view = '<button type="button" class="btn btn-primary btn-sm view" id="' . $row['id'] . '"  data-id="' . $row['position_name'] . '">
+                        <i class="fa fa-magnifier"></i>&nbsp;view
+                    </button>&nbsp;';
 
             // define action buttons via user type
             if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'
@@ -657,7 +677,10 @@ if(isset($_POST['action'])){
             $dataUri = '';
         }
 
+        $brgy_id = $serial_no;
+
         $arr_data = array(
+            'brgy_id'   => $brgy_id,
             'lname'     => addslashes($_POST['lname']),
             'fname'     => addslashes($_POST['fname']),
             'mname'     => addslashes($_POST['mname']),
@@ -686,12 +709,36 @@ if(isset($_POST['action'])){
         $sql = "INSERT INTO user_profile ($columns) VALUES ('$values')";
         $result = $conn->query($sql);
         if (isset($result) == true) {
-            $response = array(
-                'status' => 'ok',
-                'title' => 'Success!',
-                'html' => 'Data has been added!',
-                'icon' => 'success',
+            // add user account for login here
+            $lastId = $conn->lastInsertId();
+            $arr_data = array(
+                'email'             => $_POST['email'],
+                'pass'              => '',
+                'activation_code'   => '',
+                'is_active'         => '0',
+                'user_status'       => 'for validation',
+                'user_type'         => 'USER',
+                'user_profile_id'   => $lastId,
             );
+            $columns = implode(",", array_keys($arr_data));
+            $values = implode("','", array_values($arr_data));
+
+            $sql = "INSERT INTO users ($columns) VALUES ('$values')";
+            $result = $conn->query($sql);
+            if(isset($result) == true){
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'User profile has been added!',
+                    'icon' => 'success',
+                );
+            }else{
+                $response = array(
+                    'title' => 'Failed!',
+                    'html' => 'Failed to add user profile',
+                    'icon' => 'error',
+                );
+            }
+            
         } else {
             $response = array(
                 'status' => 'error',
@@ -872,37 +919,198 @@ if(isset($_POST['action'])){
             'street' => $row['address_street'],
             'contact_no' => $row['contact_no'],
             'email' => $row['email_address'],
-
             'list_province' => $province,
             'list_city' => $city,
             'list_brgy' => $brgy,
         );
     }
+    if($_POST['action'] == 'edit_user_census'){
+        $id = $_POST['user_profile_id'];
+        $sql = "SELECT id FROM user_census WHERE user_profile_id = $id";
+        $result = $conn->query($sql);
+        if($result->rowCount() > 0){
+            $arr_data = [];
+            foreach ($_POST as $key => $value) {
+                if ($key == 'action') {
+                    continue;
+                }
+                $arr_data[$key] = addslashes($value);
+            }
+
+            $cv = 0;
+            $setValues = '';
+            foreach ($arr_data as $index => $arr_data) {
+                $comma = ($cv > 0) ? ', ' : '';
+                $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+                $cv++;
+            }
+
+            $sql = "UPDATE user_census SET " . $setValues . " WHERE user_profile_id = $id";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'User Census has been updated!',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'status' => 'error',
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
+
+        }else{
+            $arr_data = [];
+            foreach ($_POST as $key => $value) {
+                if ($key == 'action') {
+                    continue;
+                }
+                $arr_data[$key] = addslashes($value);
+            }
+
+            $columns = implode(",", array_keys($arr_data));
+            $values = implode("','", array_values($arr_data));
+
+            $sql = "INSERT INTO user_census ($columns) VALUES ('$values')";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'User Census has been added!',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'status' => 'error',
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
+        }
+    }
+    if($_POST['action'] == 'fetch_user_census'){
+        $id = $_POST['id'];
+        // fetch User profile
+       $sql = "SELECT *
+                FROM user_profile
+                LEFT JOIN user_census
+                ON user_profile.id = user_census.user_profile_id
+                WHERE user_profile.id = $id";
+        // $sql = "SELECT * FROM user_profile WHERE id = $id";
+        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+
+        if (isset($row['address_region'])) {
+            $sql = "SELECT * FROM refregion WHERE regCode = " . $row['address_region'];
+            $result = $conn->query($sql);
+            $address = $result->fetch(PDO::FETCH_ASSOC);
+            $region = $address['regDesc'];
+        }
+        if (isset($row['address_province'])) {
+            $sql = "SELECT * FROM refprovince WHERE provCode = " . $row['address_province'];
+            $result = $conn->query($sql);
+            $address = $result->fetch(PDO::FETCH_ASSOC);
+            $province = $address['provDesc'];
+        }
+        if (isset($row['address_city'])) {
+            $sql = "SELECT * FROM refcitymun WHERE citymunCode = " . $row['address_city'];
+            $result = $conn->query($sql);
+            $address = $result->fetch(PDO::FETCH_ASSOC);
+            $city = $address['citymunDesc'];
+        }
+        if (isset($row['address_brgy'])) {
+            $sql = "SELECT * FROM refbrgy WHERE brgyCode = " . $row['address_brgy'];
+            $result = $conn->query($sql);
+            $address = $result->fetch(PDO::FETCH_ASSOC);
+            $brgy = $address['brgyDesc'];
+        }
+
+        $lname = $row['lname'] ? $row['lname'].' ' : '';
+        $fname = $row['fname'] ? $row['fname'].' ' : '';
+        $mname = $row['mname'] ? $row['mname'][0].'. ' : '';
+        $suffix = $row['suffix'] ? $row['suffix'] : '';
+        
+        $response = array(
+            'image'         => $row['photo'] ? $row['photo'] : '../images/upload_image.png',
+            'fullname'      => $fname . $mname . $lname . $suffix,
+            'gender'        => $row['gender'],
+            'bdate'         => $row['bdate'],
+            'civil_status'  => $row['civil_status'],
+            'citizenship'   => $row['citizenship'],
+            'voter_status'  => $row['voter_status'],
+            'contact_no'    => $row['contact_no'],
+            'email'         => $row['email_address'],
+            'birth_place'   => $row['birth_place'],
+            'address'       => $row['address_street'] . ', ' . $brgy . ' ' . $city . ', ' . $province,
+
+            'provincial_address'                => $row['provincial_address'],
+            'household_type'                    => $row['household_type'],
+            'member_count'                      => $row['member_count'],
+            'educational_attainment'            => $row['educational_attainment'],
+            'employment_status'                 => $row['employment_status'],
+            'is_philhealth'                     => $row['is_philhealth'],
+            'is_covid_vacinated'                => $row['is_covid_vacinated'],
+            'is_pwd'                            => $row['is_pwd'],
+            'with_pwd_id'                       => $row['with_pwd_id'],
+            'disability_type'                   => $row['disability_type'],
+            'is_solo_parent'                    => $row['is_solo_parent'],
+            'solo_parent_reason'                => $row['solo_parent_reason'],
+            'with_solo_parent_id'               => $row['with_solo_parent_id'],
+            'child_vaccine_completed'           => $row['child_vaccine_completed'],
+            'immunization_card_img'             => $row['immunization_card_img'],
+            'child_vaccine_location'            => $row['child_vaccine_location'],
+            'below_17_napurga'                  => $row['below_17_napurga'],
+            'when_napurga'                      => $row['when_napurga'],
+            'where_napurga'                     => $row['where_napurga'],
+            'is_breast_feeding_below_sixmonths' => $row['is_breast_feeding_below_sixmonths'],
+            'is_pregnant'                       => $row['is_pregnant'],
+            'last_period'                       => $row['last_period'],
+            'due_date_birth'                    => $row['due_date_birth'],
+            'is_prenatal_checkup'               => $row['is_prenatal_checkup'],
+            'where_prenatal'                    => $row['where_prenatal'],
+            'is_breastfeeding'                  => $row['is_breastfeeding'],
+            'month_of_child_breastfeed'         => $row['month_of_child_breastfeed'],
+            'use_contraceptives'                => $row['use_contraceptives'],
+            'what_contraceptive'                => $row['what_contraceptive'],
+            'where_contraceptive'               => $row['where_contraceptive'],
+            'house_type'                        => $row['house_type'],
+            'business_type'                     => $row['business_type'],
+            'house_materials'                   => $row['house_materials'],
+            'years_stay_manila'                 => $row['years_stay_manila'],
+            'months_stay_manila'                => $row['months_stay_manila'],
+            'residential_status'                => $row['residential_status'],
+            'water_source'                      => $row['water_source'],
+            'palikuran'                         => $row['palikuran'],
+
+        );
+      
+    }
 
 /** CERTIFICATES */
-    if($_POST['action'] == 'create_request_certificate') {        
+    if($_POST['action'] == 'create_request_certificate') {
 
-        $fullname = $_POST['lname'] ? $_POST['lname'] . ', ' : '';
-        $fullname .= $_POST['fname'] ? $_POST['fname']. ' ' : '';
-        $fullname .= $_POST['mname'] ? ' ' . substr($_POST['mname'], 0, 1) . '. ' : '';
-        $fullname .= $_POST['suffix'] ? $_POST['suffix'] : '';
-
-        if($_POST['purpose'] == 'Others'){
-            $purpose = $_POST['purpose'].' : '.$_POST['specify'];
-        }else{
-            $purpose = $_POST['purpose'];
+        switch ($_POST['purpose']) {
+            case 'Others':
+                $purpose = $_POST['purpose'] . ' : ' . $_POST['specify'];
+                break;
+            case 'Proof for Barangay Residency';
+                $purpose = $_POST['purpose'] . ' | Years : ' . $_POST['years'];
+                break;
+            case 'Living Together Certification';
+                $purpose = 'Kinakasama : '.$_POST['kinakasama'].' | Years : '.$_POST['years'];
+                break;
+            default:
+                $purpose = $_POST['purpose'];
+                break;
         }
 
         $arr_data = array(
             'email'             => $user['email'],
             'cert_type'         => $_POST['cert_type'],
             'cert_purpose'      => $purpose,
-            'fullname'          => strtoupper($fullname),
-            'region'            => $_POST['region'],
-            'province'          => $_POST['province'],
-            'city'              => $_POST['city'],
-            'brgy'              => $_POST['brgy'],
-            'street'            => $_POST['street'],
             'request_status'    => 'Pending',
             'remarks'           => 'New request',
         );
@@ -1103,46 +1311,59 @@ if(isset($_POST['action'])){
         $id = $_POST['id'];
         $date = $_POST['date'];
         $email = $_POST['email'];
-
-        $arr_data = array(
-            'request_status'    => 'For Claim',
-            'remarks'           => 'Claming Date : '.$date,
-            'claiming_date'     => $date,
-            'updated_at'        => $updated_at,
-        );
-
-        $cv = 0;
-        $setValues = '';
-        foreach ($arr_data as $index => $arr_data) {
-            $comma = ($cv > 0) ? ', ' : '';
-            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
-            $cv++;
-        }
-
-        $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+        //Fetch email notifications
+        $sql = "SELECT * FROM email_notification WHERE notification_for = 'Certificate Request'";
         $result = $conn->query($sql);
-        if (isset($result) == true) {
-            //Fetch email notifications
-            $sql = "SELECT * FROM email_notification WHERE notification_for = 'Certificate Request'";
-            $result = $conn->query($sql);
+        if ($result->rowCount() > 0) {
             $row = $result->fetch(PDO::FETCH_ASSOC);
-            $subject = 'Barangay Certificate Request - Approved!';
-            $message = '<h4>'.$row['subject_title'].'</h4>
-                        <p>'.$row['message_content'].'</p>
-                        <p>Claiming Date : '.$date.'</p>';
-            sendEmail($email, $subject, $message);
-            $response = array(
-                'title' => 'Approved!',
-                'html' => 'Email notification sent. Claming date is on <b>'.$date.'</b>',
-                'icon' => 'success',
+            $email_subject = $row['subject_title'];
+            $email_message = $row['message_content'];
+
+            $arr_data = array(
+                'request_status'    => 'For Claim',
+                'remarks'           => 'Claming Date : ' . $date,
+                'claiming_date'     => $date,
+                'updated_at'        => $updated_at,
             );
+
+            $cv = 0;
+            $setValues = '';
+            foreach ($arr_data as $index => $arr_data) {
+                $comma = ($cv > 0) ? ', ' : '';
+                $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+                $cv++;
+            }
+
+            $sql = "UPDATE certificates SET " . $setValues . " WHERE id = $id";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+
+                $subject = 'Barangay Certificate Request - Approved!';
+                $message = '<h4>' . $email_subject . '</h4>
+                        <p>' . $email_message . '</p>
+                        <p>Claiming Date : ' . $date . '</p>';
+                sendEmail($email, $subject, $message);
+
+                $response = array(
+                    'title' => 'Approved!',
+                    'html' => 'Email notification sent. Claming date is on <b>' . $date . '</b>',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }            
+
         } else {
             $response = array(
-                'title' => 'Error!',
-                'html' => 'Please try again later!',
-                'icon' => 'error',
+                'title' => 'Create email notification',
+                'html' => 'Please setup email notification first!',
+                'icon' => 'info',
             );
-        }
+        }       
     }
     if($_POST['action'] == 'claim_request_certificate') {
         $id = $_POST['id'];
@@ -1202,8 +1423,17 @@ if(isset($_POST['action'])){
             $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
             // Encode the resized image back to Base64
             ob_start();
-            imagejpeg($resizedImage);
-            // imagepng($resizedImage);
+
+            switch ($imageType) {
+                case 'image/png':
+                    imagepng($resizedImage);
+                    break;
+
+                default:
+                    imagejpeg($resizedImage);
+                    break;
+            }
+
             $imageBase64 = base64_encode(ob_get_contents());
             ob_end_clean();
             $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
@@ -1217,30 +1447,17 @@ if(isset($_POST['action'])){
         $fullname .= $_POST['suffix'] ? $_POST['suffix'] : '';
 
         $arr_data = array(
-            'photo'         => $dataUri,
-            'email'         => $user['email'],
-            'fullname'      => $fullname,
-            'bdate'         => $_POST['bdate'],
-            // 'gender'        => $_POST['gender'],
-            // 'civil_status'  => $_POST['civil_status'],
-            'region'        => $_POST['region'],
-            'province'      => $_POST['province'],
-            'city'          => $_POST['city'],
-            'brgy'          => $_POST['brgy'],
-            'street'        => $_POST['street'],
-            // 'contact_no'    => $_POST['contact_no'],
-            // 'tel_no'        => '',
-            // 'employers_name' => '',
-            // 'lenght_stay_year'  => $_POST['length_year'],
-            // 'lenght_stay_month' => $_POST['length_month'],
-            // 'fathers_name'      => $_POST['fathers_name'],
-            // 'mothers_name'      => $_POST['mothers_name'],
+            'photo'             => $dataUri,
+            'id_no'             => rand(000, 999).'-'.date('Y'),
+            'brgy_id'           => $_POST['brgy_id'],
+            'email'             => $user['email'],
+            'fullname'          => $fullname,
+            'bdate'             => $_POST['bdate'],
             'emergency_person'  => $_POST['emergency_person'],
             'emergency_contact' => $_POST['emergency_contact'],
             'emergency_relationship'    => $_POST['emergency_relationship'],
             'emergency_address' => $_POST['emergency_address'],
-            'request_status'    => 'Pending',
-            // 'is_active' => 1,        
+            'request_status'    => 'Pending',                    
         );
 
         $columns = implode(",", array_keys($arr_data));
@@ -1564,7 +1781,6 @@ if(isset($_POST['action'])){
         $sql = "SELECT * FROM email_notification WHERE notification_for = 'Barangay ID Request'";
         $result = $conn->query($sql);
         if($result->rowCount() > 0){
-            $result = $conn->query($sql);
             $row = $result->fetch(PDO::FETCH_ASSOC);
 
             $email_subject = $row['subject_title'];
@@ -1620,9 +1836,16 @@ if(isset($_POST['action'])){
     if ($_POST['action'] == 'claim_request_barangay_id') {
         $id = $_POST['id'];
         $email = $_POST['email'];
-
+        // Cmpute 3 months from now
+        // Get the current date
+        $currentDate = new DateTime();
+        // Add 3 months to the current date
+        $currentDate->modify('+3 months');
+        // Format the date to a readable format
+        $expiration_date = $currentDate->format('Y-m-d');
         $arr_data = array(
             'request_status'    => 'Completed',
+            'expiration_date'   => $expiration_date,
             'remarks'           => 'Successfully claimed!',
             'updated_at'        => $updated_at,
         );
@@ -2279,9 +2502,12 @@ if(isset($_POST['fetch'])){
                             </div>';
                 break;
             case 'Certificate of Residency':
-                $response = '<div class="custom-control custom-radio m-2">
-                                <input class="custom-control-input" type="radio" id="purpose1" name="purpose" value="Proof for Barangay Residency" required>
-                                <label for="purpose1" class="custom-control-label">Proof for Barangay Residency</label>
+                $response = '<div class="row pl-2">
+                                <div class="custom-control custom-radio m-2">
+                                    <input class="custom-control-input" type="radio" id="purpose1" name="purpose" value="Proof for Barangay Residency" required>
+                                    <label for="purpose1" class="custom-control-label">Proof for Barangay Residency</label>
+                                </div>
+                                <input type="number" class="form-control col-sm-6" name="years" id="years" placeholder="Year/s of length in Barangay" disabled>
                             </div>
                             <div class="custom-control custom-radio m-2">
                                 <input class="custom-control-input" type="radio" id="purpose2" name="purpose" value="Proof for Barangay Non-Residency" required>
@@ -2308,9 +2534,26 @@ if(isset($_POST['fetch'])){
                 break;
             case 'Certification of Living Together':
                 $response = '<div class="custom-control custom-radio m-2">
-                                <input class="custom-control-input" type="radio" id="purpose1" name="purpose" value="Living together Certification" required>
-                                <label for="purpose1" class="custom-control-label">Living together Certification</label>
-                            </div>';
+                                <input class="custom-control-input" type="radio" name="purpose" value="Living Together Certification" checked required>
+                                <label class="custom-control-label">Living Together Certification</label>
+                                <div class="row mb-2 mt-3">
+                                    <div class="col-5">
+                                        <label for="years" class="form-label">Year/s of living together</label>
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="number" class="form-control" name="years" id="years" placeholder="Ilang taong nagsasama?" required>                                
+                                    </div>
+                                </div>         
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label for="kinakasama" class="form-label">Pangalan ng kinakasama</label>
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" name="kinakasama" id="kinakasama" placeholder="Buong pangalan ng kinakasama" required>                                
+                                    </div>
+                                </div>
+                            </div>
+                            ';
                 break;
             
             default:
@@ -2441,6 +2684,18 @@ if(isset($_POST['fetch'])){
 
         echo json_encode($response);
     }
+    if($_POST['fetch'] == 'print_certificate'){
+        $sql = "SELECT * FROM certificates WHERE id = ".$_POST['id'];
+        $result = $conn->query($sql);
+        if($result->rowCount() > 0){
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            $response = array(
+                'title' => $row['cert_type'],
+                'name' => $row['fullname'] ? $row['fullname'] : $row['email'],
+            );
+        }
+        echo json_encode($response);
+    }
 }
 
 //Generate OTP
@@ -2481,7 +2736,6 @@ function sendEmail($email, $subject, $message){
         echo "Mailer Error: " . $mail->ErrorInfo;
     }
 }
-
 function sendOTP($email, $subject){
     //Send Verification Email
     $mail = new PHPMailer();

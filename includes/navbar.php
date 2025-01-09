@@ -18,11 +18,14 @@
                     <img src="../images/avatar.png" class="img-circle elevation-2" alt="User Image">
                     <p>
                         <?= $user['email'] ?>
-                        <small><?= $user['created_at'] ?></small>
+                        <small><?= $profile['brgy_id'] ?? 'No Barangay ID' ?></small>
                     </p>
                 </li>
                 <li class="user-footer text-sm">
-                    <a href="logout" class="btn btn-default btn-flat btn-block">
+                    <button class="btn btn-default btn-flat userSettings" data-toggle="modal" data-target="#modal_user_settings">
+                        <i class="fas fa-users-cog"></i>&nbsp;Settings
+                    </button>
+                    <a href="logout" class="btn btn-default btn-flat float-right">
                         <i class="nav-icon fas fa-sign-out-alt"></i>&nbsp;Sign out
                     </a>
                 </li>
@@ -31,3 +34,49 @@
     </ul>
 </nav>
 <!-- /.navbar -->
+<div class="modal fade" id="modal_user_settings" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h4 class="modal-title">
+                    <li class="fas fa-users-cog"></li> User Settings
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form" method="post">
+                <div class="modal-body">
+                    <div class="card-body m-0 p-0">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="text" class="form-control" name="email" id="email" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="contact">Contact Number</label>
+                            <input type="text" class="form-control" name="contact" id="contact" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="old_pass">Old password</label>
+                            <input type="password" class="form-control" name="old_pass" id="old_pass" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="pass">New password</label>
+                            <input type="password" class="form-control" name="pass" id="pass" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="pass2">Confirm new password</label>
+                            <input type="password" class="form-control" name="pass2" id="pass2" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <input type="hidden" name="type" id="type" value="" />
+                    <input type="hidden" name="action" id="action" value="" />
+                    <input type="submit" name="btn_action" id="btn_action" class="btn btn-primary" value="SAVE" />
+                    <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

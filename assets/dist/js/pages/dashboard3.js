@@ -57,12 +57,12 @@ $(function () {
 
             // Include a dollar sign in the ticks
             callback: function (value) {
-              if (value >= 1000) {
-                value /= 1000
-                value += 'k'
+              if (value >= 1520) {
+                // value /= 1000
+                value += ''
               }
 
-              return '$' + value
+              return '' + value
             }
           }, ticksStyle)
         }],
@@ -81,25 +81,36 @@ $(function () {
   // eslint-disable-next-line no-unused-vars
   var visitorsChart = new Chart($visitorsChart, {
     data: {
-      labels: ['18th', '20th', '22nd', '24th', '26th', '28th', '30th'],
+      labels: ['JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
       datasets: [{
         type: 'line',
         data: [100, 120, 170, 167, 180, 177, 160],
         backgroundColor: 'transparent',
-        borderColor: '#007bff',
-        pointBorderColor: '#007bff',
-        pointBackgroundColor: '#007bff',
+        borderColor: '#17a2b8',
+        pointBorderColor: '#17a2b8',
+        pointBackgroundColor: '#17a2b8',
         fill: false
         // pointHoverBackgroundColor: '#007bff',
         // pointHoverBorderColor    : '#007bff'
       },
       {
         type: 'line',
-        data: [60, 80, 70, 67, 80, 77, 100],
+        data: [10, 20, 90, 67, 80, 77, 100],
         backgroundColor: 'tansparent',
-        borderColor: '#ced4da',
-        pointBorderColor: '#ced4da',
-        pointBackgroundColor: '#ced4da',
+        borderColor: '#28a745',
+        pointBorderColor: '#28a745',
+        pointBackgroundColor: '#28a745',
+        fill: false
+        // pointHoverBackgroundColor: '#ced4da',
+        // pointHoverBorderColor    : '#ced4da'
+      },
+      {
+        type: 'line',
+        data: [60, 80, 70, 50, 80, 100, 180],
+        backgroundColor: 'tansparent',
+        borderColor: '#ffc107',
+        pointBorderColor: '#ffc107',
+        pointBackgroundColor: '#ffc107',
         fill: false
         // pointHoverBackgroundColor: '#ced4da',
         // pointHoverBorderColor    : '#ced4da'

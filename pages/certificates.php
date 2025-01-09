@@ -17,11 +17,11 @@ include_once('session.php');
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">Certificates</h1>
-                            <?php if($user['user_type'] == 'USER'){?>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                <i class="fa fa-plus"></i> REQUEST CERTIFICATE
-                            </button>
-                            <?php }?>
+                            <?php if ($user['user_type'] == 'USER') { ?>
+                                <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
+                                    <i class="fa fa-plus"></i> REQUEST CERTIFICATE
+                                </button>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -32,13 +32,27 @@ include_once('session.php');
                         <div class="col-12">
                             <div class="card card-primary card-outline">
                                 <div class="card-header">
-                                    <h4 class="card-title">Request Table</h4>
+                                    <h4 class="card-title">
+                                        <select class="custom-select" name="select_cert_type" id="select_cert_type">
+                                            <option value="" selected hidden disabled>All Certificate Request</option>
+                                            <option value="">All Certificate Request</option>
+                                            <?php
+                                            $sql = "SELECT DISTINCT certificates.cert_type FROM certificates";
+                                            $result = $conn->query($sql);
+                                            if ($result->rowCount() > 0) {
+                                                foreach ($result as $row) {
+                                                    echo '<option value="' . $row['cert_type'] . '">' . $row['cert_type'] . '</option>';
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </h4>
                                     <div class="card-tools">
-                                        <?php if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){?>
-                                        <button class="btn btn-info btn-sm notification" data-toggle="modal" data-target="#modal_notification">
-                                            <i class="fa fa-envelope"></i>&nbsp;EMAIL NOTIFICATION
-                                        </button>
-                                        <?php }?>
+                                        <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
+                                            <button class="btn btn-info btn-sm notification" data-toggle="modal" data-target="#modal_notification">
+                                                <i class="fa fa-envelope"></i>&nbsp;EMAIL NOTIFICATION
+                                            </button>
+                                        <?php } ?>
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                                     </div>
                                 </div>
@@ -51,7 +65,7 @@ include_once('session.php');
                                                 <th style="width: 20%">DATE REQUEST</th>
                                                 <th style="width: 20%">FULL NAME</th>
                                                 <th style="width: 20%">CERTIFICATE REQUEST</th>
-                                                <th style="width: 20%">PURPOSE</th>
+                                                <th style="width: 20%">DETAILS</th>
                                                 <th style="width: 20%">REMARKS STATUS</th>
                                                 <th style="width: 20%" class="text-center">ACTION</th>
                                             </tr>
@@ -92,29 +106,18 @@ include_once('session.php');
         function submitForm(event) {
             event.preventDefault();
             const form1 = document.getElementById('form1');
-            const form2 = document.getElementById('form2');
-            const form3 = document.getElementById('form3');
-            const form4 = document.getElementById('form4');
-            if (form4.checkValidity()) {
+            const form = document.getElementById('form2');
+            if (form.checkValidity()) {
                 // Here you can handle the form submission, e.g., send data to the server
                 var data = new FormData()
                 var form_data = $(form1).serializeArray()
                 $.each(form_data, function(key, input) {
                     data.append(input.name, input.value)
                 })
-                var form_data = $(form2).serializeArray()
+                var form_data = $(form).serializeArray()
                 $.each(form_data, function(key, input) {
                     data.append(input.name, input.value)
                 })
-                var form_data = $(form3).serializeArray()
-                $.each(form_data, function(key, input) {
-                    data.append(input.name, input.value)
-                })
-                var form_data = $(form4).serializeArray()
-                $.each(form_data, function(key, input) {
-                    data.append(input.name, input.value)
-                })
-
                 // Send the form data to the server using AJAX
                 $.ajax({
                     type: 'POST',
@@ -155,7 +158,7 @@ include_once('session.php');
                     }
                 });
             } else {
-                form4.reportValidity();
+                form.reportValidity();
             }
         }
 
@@ -450,6 +453,24 @@ include_once('session.php');
                 }
             });
         });
+        $(document).on('change', '#select_cert_type', function() {
+
+            $('#dataTable').DataTable({
+                "responsive": false,
+                "autoWidth": false,
+                'ordering': false,
+                "scrollX": true,
+                "destroy": true,
+                "ajax": {
+                    type: 'post',
+                    url: 'ajax',
+                    data: {
+                        table: 'certificates',
+                        filter: $(this).val()
+                    },
+                }
+            });
+        });
         // Select certificate purpose
         $(document).on('change', '[name="cert_type"]', function() {
             var cert_type = $(this).val();
@@ -475,6 +496,17 @@ include_once('session.php');
                 $('#form2 #specify').prop('disabled', 1)
                 $('#form2 #specify').prop('required', 0)
                 $('#form2 #specify').val('')
+            }
+        });
+        // Condition if selected Proof of residency
+        $(document).on('change', '[name="purpose"]', function() {
+            if ($(this).val() == 'Proof for Barangay Residency') {
+                $('#form2 #years').prop('disabled', 0)
+                $('#form2 #years').prop('required', 1)
+            } else {
+                $('#form2 #years').prop('disabled', 1)
+                $('#form2 #years').prop('required', 0)
+                $('#form2 #years').val('')
             }
         });
         // Fetch address selection
@@ -580,11 +612,13 @@ include_once('session.php');
             "autoWidth": false,
             'ordering': false,
             "scrollX": true,
+            "destroy": true,
             "ajax": {
                 type: 'post',
                 url: 'ajax',
                 data: {
-                    table: 'certificates'
+                    table: 'certificates',
+                    filter: ''
                 },
             }
         });

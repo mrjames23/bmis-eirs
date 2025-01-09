@@ -16,11 +16,11 @@ include_once('session.php');
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title">Barangay ID</h1>
-                            <?php if($user['user_type'] == 'USER'){?>
-                            <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                <i class="fa fa-plus"></i> REQUEST BARANGAY ID
-                            </button>
-                            <?php }?>
+                            <?php if ($user['user_type'] == 'USER') { ?>
+                                <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
+                                    <i class="fa fa-plus"></i> REQUEST BARANGAY ID
+                                </button>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -33,10 +33,10 @@ include_once('session.php');
                                 <div class="card-header">
                                     <h4 class="card-title">Request Table</h4>
                                     <div class="card-tools">
-                                        <?php if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){?>
-                                        <button class="btn btn-info btn-sm notification" data-toggle="modal" data-target="#modal_notification">
-                                            <i class="fa fa-envelope"></i>&nbsp;EMAIL NOTIFICATION
-                                        </button>
+                                        <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
+                                            <button class="btn btn-info btn-sm notification" data-toggle="modal" data-target="#modal_notification">
+                                                <i class="fa fa-envelope"></i>&nbsp;EMAIL NOTIFICATION
+                                            </button>
                                         <?php } ?>
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                                     </div>
@@ -45,16 +45,18 @@ include_once('session.php');
                                     <table id="dataTable" class="table table-hover table-head-fixed text-nowrap projects">
                                         <thead>
                                             <tr>
-                                                <th style="width: 1%">#</th>
                                                 <th style="width: 20%">REQUEST STATUS</th>
                                                 <th style="width: 20%">DATE REQUEST</th>
-                                                <th style="width: 20%">FULL NAME</th>
+                                                <th style="width: 1%">CONTROL #</th>
+                                                <th style="width: 20%">PHOTO & FULL NAME</th>
                                                 <th style="width: 20%">BIRTHDAY</th>
-                                                <th style="width: 20%">ADDRESS</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (PERSON)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (RELATIONSHIP)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (ADDRESS)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (CONTACT #)</th>
+                                                <th style="width: 20%">CLAMING DATE</th>
+                                                <th style="width: 20%">EXPIRATION DATE</th>
+                                                <th style="width: 20%">STATUS</th>
                                                 <th style="width: 20%" class="text-center">ACTION</th>
                                             </tr>
                                         </thead>
@@ -105,24 +107,19 @@ include_once('session.php');
         function submitForm(event) {
             event.preventDefault();
             const form1 = document.getElementById('form1');
-            const form2 = document.getElementById('form2');
-            const form3 = document.getElementById('form3');
-            if (form3.checkValidity()) {
+            const form = document.getElementById('form2');
+            if (form.checkValidity()) {
                 // Here you can handle the form submission, e.g., send data to the server
                 var data = new FormData()
                 var form_data = $(form1).serializeArray()
                 $.each(form_data, function(key, input) {
                     data.append(input.name, input.value)
                 })
-                var form_data = $(form2).serializeArray()
+                var form_data = $(form).serializeArray()
                 $.each(form_data, function(key, input) {
                     data.append(input.name, input.value)
                 })
-                var form_data = $(form3).serializeArray()
-                $.each(form_data, function(key, input) {
-                    data.append(input.name, input.value)
-                })
-
+                data.append('file', $('#modal #file')[0].files[0])
                 //validate contact
                 var contact = $('[name="emergency_contact"]').val().replace(/[^0-9]/gi, '');
                 if (contact.length != 11) {
@@ -171,7 +168,7 @@ include_once('session.php');
                     });
                 }
             } else {
-                form3.reportValidity();
+                form.reportValidity();
             }
         }
 

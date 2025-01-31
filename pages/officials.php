@@ -115,7 +115,7 @@ include_once('session.php');
                         </div>
                     </div>
                 </div>
-                <section class="content">
+                <section class="content mb-2">
                     <div class="container-fluid">
                         <div class="text-center mt-5" id="barangay_officials_list">
                             <h1>CANDIDATE NAME</h1>

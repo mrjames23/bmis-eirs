@@ -4,7 +4,7 @@
     define('SITE_TITLE', 'BMIS-EIRS');
     define('ASSETS', '../assets');
 
-    $localServer = ['localhost/'];        
+    $localServer = ['localhost/','192.168.0.113/'];        
     
     if(in_array(SERVER_NAME, $localServer)){
         define('DB_HOST', 'localhost');
@@ -17,5 +17,4 @@
         define('DB_PASS', 'EsfXTQQ7cEX393p');
         define('DB_NAME', 'if0_37567443_bmis_eirs');
     }
-    
 ?> 

@@ -571,8 +571,8 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
-                    <input type="text" name="id" id="id">
-                    <input type="text" name="action" id="action">
+                    <input type="hidden" name="user_profile_id" id="id">
+                    <input type="hidden" name="action" id="action">
                     <button type="submit" class="btn btn-primary">SAVE</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
                 </div>

@@ -1,9 +1,10 @@
-<div class="modal fade" id="modal" data-backdrop="static" data-keyboard="false">
+<div class="modal fade" id="modal" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+    
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h4 class="modal-title">
-                    <li class="fa fa-user"></li> Create Account
+                    <li class="fa fa-user"></li> Create Staff Account
                 </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -38,7 +39,7 @@
                 <div class="modal-footer justify-content-between">
                     <input type="hidden" name="id" id="id" value="" />
                     <input type="hidden" name="action" id="action" />
-                    <input type="submit" name="btn_action" id="btn_action" class="btn btn-primary" value="SAVE" />
+                    <button type="submit" class="btn btn-primary">SAVE</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
                 </div>
             </form>

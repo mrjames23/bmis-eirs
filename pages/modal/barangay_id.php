@@ -66,7 +66,7 @@
                                                     color: #fff;
                                                     position: fixed;
                                                     z-index: -1;
-                                                    border: 1px solid #fff;
+                                                    border: 0px solid #fff;
                                                 }
                                             </style>
                                             <label for="file">

@@ -1,11 +1,14 @@
 php_value max_execution_time 600
-Options -Indexes
+
 
 <IfModule mod_rewrite.c>
-  
+  # Options -Indexes
+  Options -Multiviews
+
   # Unless directory, remove trailing slash
   RewriteEngine On
   RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME}\.php -f
   # Resolve .php file for extensionless PHP URLs
   RewriteRule ^(.*)$ $1.php

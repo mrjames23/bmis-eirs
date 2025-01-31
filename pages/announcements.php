@@ -14,13 +14,18 @@ include_once('session.php');
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
+
                     <div class="row mb-2">
-                        <div class="col-sm-12">
-                            <h1 class="card-title">Events & Announcements</h1>
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Events & Announcements</h1>
+                        </div>
+                        <div class="col-sm-6">
                             <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
-                                <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
-                                    <i class="fa fa-plus"></i> CREATE
-                                </button>
+                                <div class="breadcrumb float-sm-right">
+                                    <button class="btn btn-primary create" data-toggle="modal" data-target="#modal">
+                                        <i class="fa fa-plus"></i> CREATE ANNOUNCEMENT
+                                    </button>
+                                </div>
                             <?php } ?>
                         </div>
                     </div>
@@ -126,7 +131,7 @@ include_once('session.php');
         }
 
         $(function() {
-            $('#form').submit(function(e) {
+            $(document).on('submit', '#form', function(e) {
                 e.preventDefault();
                 $.ajax({
                     type: "POST",
@@ -173,7 +178,7 @@ include_once('session.php');
                         })
                     }
                 });
-            });
+            })
             // Add announcement on modal show
             $(document).on('click', '.create', function() {
                 $('#modal #action').val('create_announcement')
@@ -287,6 +292,7 @@ include_once('session.php');
             $('#modal').on('hidden.bs.modal', function() {
                 // Reset the form fields
                 $('#form')[0].reset();
+                $('.img-content').attr('src', '../images/upload_image.png');
             });
         })
     </script>

@@ -62,8 +62,14 @@ include_once('session.php');
     <?php include_once('../includes/script.php') ?>
     <script>
         $(function() {
-            $('#form').submit(function(e) {
+            $(document).on('submit', '#form', function(e) {
                 e.preventDefault();
+                var pass1 = $('#modal #pass')
+                var pass2 = $('#modal #pass2')
+                if (validatePass(pass1, pass2) == false) {
+                    return false;
+                    pass1.focus()
+                }
                 $.ajax({
                     type: "POST",
                     url: "ajax",
@@ -215,13 +221,13 @@ include_once('session.php');
             });
             // VALIDATE USER PASS INPUT
             $('#modal #pass').focusout(function() {
-                var pass1 = $('#pass')
-                var pass2 = $('#pass2')
+                var pass1 = $('#modal #pass')
+                var pass2 = $('#modal #pass2')
                 validatePass(pass1, pass2)
             });
             $('#modal #pass2').focusout(function() {
-                var pass1 = $('#pass')
-                var pass2 = $('#pass2')
+                var pass1 = $('#modal #pass')
+                var pass2 = $('#modal #pass2')
                 validatePass(pass1, pass2)
             });
             $('#modal').on('hidden.bs.modal', function() {

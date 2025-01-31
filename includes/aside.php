@@ -55,7 +55,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="inventory.php" class="nav-link">
                             <i class="nav-icon fas fa-list"></i>
                             <p>
                                 Inventory
@@ -63,7 +63,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="reservations.php" class="nav-link">
                             <i class="nav-icon fas fa-edit"></i>
                             <p>
                                 Reservations
@@ -170,7 +170,7 @@
                             </p>
                         </a>
                     </li>
-                    <!-- <li class="nav-header">EQUIPMENT RESERVATIONS</li>
+                    <li class="nav-header">EQUIPMENT RESERVATIONS</li>
                     <li class="nav-item">
                         <a href="dashboard.php" class="nav-link">
                             <i class="nav-icon fa fa-tachometer-alt"></i>
@@ -180,7 +180,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="inventory.php" class="nav-link">
                             <i class="nav-icon fas fa-list"></i>
                             <p>
                                 Inventory
@@ -188,13 +188,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="reservations.php" class="nav-link">
                             <i class="nav-icon fas fa-edit"></i>
                             <p>
                                 Reservations
                             </p>
                         </a>
-                    </li> -->
+                    </li>
                     <li class="nav-header">OTHERS</li>
                     <li class="nav-item">
                         <a href="officials.php" class="nav-link">
@@ -256,31 +256,15 @@
                             </p>
                         </a>
                     </li>
-                    <!-- <li class="nav-header">EQUIPMENT RESERVATIONS</li>
+                    <li class="nav-header">EQUIPMENT RESERVATIONS</li>                    
                     <li class="nav-item">
-                        <a href="dashboard.php" class="nav-link">
-                            <i class="nav-icon fa fa-tachometer-alt"></i>
-                            <p>
-                                Dashboard
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-list"></i>
-                            <p>
-                                Inventory
-                            </p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="reservations.php" class="nav-link">
                             <i class="nav-icon fas fa-edit"></i>
                             <p>
                                 Reservations
                             </p>
                         </a>
-                    </li> -->
+                    </li>
                     <li class="nav-header">OTHERS</li>
                     <li class="nav-item">
                         <a href="officials.php" class="nav-link">

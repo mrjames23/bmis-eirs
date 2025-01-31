@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="<?= ASSETS ?>/plugins/fontawesome-free/css/all.min.css">
     <!-- Tempusdominus Bootstrap 4 -->
     <link rel="stylesheet" href="<?= ASSETS ?>/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- summernote -->
+    <link rel="stylesheet" href="<?= ASSETS ?>/plugins/summernote/summernote-bs4.min.css">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="<?= ASSETS ?>/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     <!-- SweetAlert2 -->
@@ -81,6 +83,15 @@
                     Swal.showLoading()
                 }
             })
+        }
+
+        function cardLoadingOn(overlayId) {
+            $(overlayId).addClass('overlay')
+            $(overlayId).append('<i class="fas spinner-border"></i>')
+        }
+        function cardLoadingOff(overlayId) {
+            $(overlayId).removeClass('overlay')
+            $(overlayId).html('')
         }
     </script>
 </head>

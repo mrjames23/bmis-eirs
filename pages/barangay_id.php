@@ -1,5 +1,5 @@
 <?php
-$page = 'Certificates';
+$page = 'Barangay ID';
 include_once('session.php');
 ?>
 <?php include_once('../includes/head.php') ?>
@@ -46,16 +46,16 @@ include_once('session.php');
                                         <thead>
                                             <tr>
                                                 <th style="width: 20%">REQUEST STATUS</th>
-                                                <th style="width: 20%">DATE REQUEST</th>
-                                                <th style="width: 1%">CONTROL #</th>
                                                 <th style="width: 20%">PHOTO & FULL NAME</th>
                                                 <th style="width: 20%">BIRTHDAY</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (PERSON)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (RELATIONSHIP)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (ADDRESS)</th>
                                                 <th style="width: 20%">IN CASE OF EMERGENCY (CONTACT #)</th>
+                                                <th style="width: 20%">DATE REQUEST</th>
                                                 <th style="width: 20%">CLAMING DATE</th>
                                                 <th style="width: 20%">EXPIRATION DATE</th>
+                                                <th style="width: 1%">CONTROL #</th>
                                                 <th style="width: 20%">STATUS</th>
                                                 <th style="width: 20%" class="text-center">ACTION</th>
                                             </tr>
@@ -73,6 +73,7 @@ include_once('session.php');
     <?php include_once('./modal/barangay_id.php') ?>
     <?php include_once('./modal/email_notification.php') ?>
     <?php include_once('../includes/script.php') ?>
+
     <script>
         function readURL(input) {
             if (input.files && input.files[0]) {
@@ -586,3 +587,13 @@ include_once('session.php');
             }
         });
     </script>
+
+
+
+
+<body>
+    
+
+
+</body>
+</html>

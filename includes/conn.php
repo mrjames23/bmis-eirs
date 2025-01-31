@@ -198,6 +198,39 @@ try {
                 INDEX (email,id_no,brgy_id)
                 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
             ");
+/** EQUIPMENTS */
+    $conn->exec("CREATE TABLE IF NOT EXISTS equipments (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                
+                control_no VARCHAR(255) DEFAULT NULL,
+                category VARCHAR(255) DEFAULT NULL,
+                photo LONGBLOB DEFAULT NULL,
+                item_name VARCHAR(255) DEFAULT NULL,
+                details TEXT DEFAULT NULL,
+                descriptions TEXT DEFAULT NULL,
+                quantity TEXT DEFAULT NULL,             
+                item_status TEXT DEFAULT NULL,             
+                updated_at TEXT DEFAULT NULL,                
+                INDEX (category,control_no,item_status)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
+/** RESERVATIONS */
+    $conn->exec("CREATE TABLE IF NOT EXISTS reservations (
+                id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                
+                control_no VARCHAR(255) DEFAULT NULL,
+                users_id VARCHAR(255) DEFAULT NULL,
+                category TEXT DEFAULT NULL, 
+                quantity VARCHAR(255) DEFAULT NULL,   
+                days_borrowed TEXT DEFAULT NULL,     
+                date_borrowed TEXT DEFAULT NULL,     
+                date_returned TEXT DEFAULT NULL,     
+                request_status TEXT DEFAULT NULL,     
+                return_remarks TEXT DEFAULT NULL,     
+                updated_at TEXT DEFAULT NULL,                
+                INDEX (control_no,users_id,category)
+                )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            ");
 /** SETTINGS */
     $conn->exec("CREATE TABLE IF NOT EXISTS settings (
                 id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

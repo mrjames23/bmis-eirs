@@ -342,19 +342,100 @@ if(isset($_POST['table'])){
                     </ul>';
 
             $sub_array = array();
-            $sub_array[] = $status;            
-            $sub_array[] = $row['created_at'];
-            $sub_array[] = $row['id_no'];
+            $sub_array[] = $status;
             $sub_array[] = $fullname;
             $sub_array[] = $row['bdate'];
             $sub_array[] = $row['emergency_person'];
             $sub_array[] = $row['emergency_relationship'];
             $sub_array[] = $row['emergency_address'];
             $sub_array[] = $row['emergency_contact'];
+            $sub_array[] = $row['created_at'];
             $sub_array[] = $row['claiming_date'];
             $sub_array[] = $row['expiration_date'];
+            $sub_array[] = $row['id_no'];
             $sub_array[] = $row['remarks'];
             $sub_array[] = '<div class="text-right">'.$action.'</div>';
+            $data[] = $sub_array;
+        }
+        $response = array('data' => $data ?? '');
+    }
+    if ($_POST['table'] == 'inventory') {        
+        switch ($_POST['filter']) {
+            case '':
+                $filter = '';
+                break;
+            default:
+                $filter = "WHERE category = '{$_POST['filter']}'";
+                break;
+        }
+        $sql = "SELECT * FROM equipments $filter";
+        $result = $conn->query($sql);
+        $count = 1;
+        foreach ($result as $row) {
+            // Action Buttons
+            $delete = '<button type="button" class="btn btn-outline-danger btn-sm delete" id="' . $row['id'] . '" data-id="' . $row['control_no']  . '">
+                        <i class="fa fa-times"></i>
+                    </button>&nbsp;';
+            $approve = '<button type="button" class="btn btn-primary btn-sm approve" id="' . $row['id'] . '" data-id="' . $row['control_no']  . '" data-val="' . $row['item_name'] . '">
+                        <i class="fa fa-thumbs-up"></i>&nbsp;Approve
+                    </button>&nbsp;';
+            $decline = '<button type="button" class="btn btn-danger btn-sm decline" id="' . $row['id'] . '" data-id="' . $row['control_no']  . '">
+                        <i class="fa fa-thumbs-down"></i>&nbsp;Decline
+                    </button>&nbsp;';
+            $claim = '<button type="button" class="btn btn-success btn-sm claim" id="' . $row['id'] . '" data-id="' . $row['control_no']  . '" data-val="' . $row['item_name'] . '">
+                        <i class="fa fa-check"></i>&nbsp;Complete
+                    </button>&nbsp;';
+            $edit = '<button type="button" class="btn btn-primary btn-sm edit" id="' . $row['id'] . '">
+                        <i class="fa fa-edit"></i>&nbsp;Edit
+                    </button>&nbsp;';
+            // Define user status and buttons
+            switch ($row['item_status']) {
+                case '0':
+                    $status = '<span class="badge badge-secondary rounded-lg">UNAVAILABLE</span>';
+                    break;
+                case '1':
+                    $status = '<span class="badge badge-success rounded-lg">AVAILABLE</span>';
+                    break;
+                case '2':
+                    $status = '<span class="badge badge-info rounded-lg">BORROWED/RESERVED</span>';
+                    break;
+                case '3':
+                    $status = '<span class="badge badge-danger rounded-lg">DAMAGED</span>';
+                    break;
+                case '4':
+                    $status = '<span class="badge badge-warning rounded-lg">LOST</span>';
+                    break;
+                default:
+                    $status = '<span class="badge badge-default rounded-lg">' . strtoupper($row['item_status']) . '</span>';
+                    break;
+            }
+            // Define action buttons via user type
+            switch ($user['user_type']) {
+                case 'ADMIN':
+                    $action = $edit.$delete;
+                    break;
+                case 'STAFF':
+                    $action = $edit;
+                    break;
+                default:
+                    $action = '';
+                    break;
+            }
+
+            $image = '<div class="product-img">
+                      <img src="'.$row['photo'].'"alt="Product Image" class="img-size-50">
+                    </div>';
+
+            $sub_array = array();
+            $sub_array[] = $count++ . '.';
+            $sub_array[] = $image;
+            $sub_array[] = $row['control_no'];
+            $sub_array[] = $row['category'];
+            $sub_array[] = $row['item_name'];
+            $sub_array[] = $row['descriptions'];
+            $sub_array[] = $row['quantity'];
+            $sub_array[] = $status;
+            $sub_array[] = '<div class="text-right">' . $action . '</div>';
             $data[] = $sub_array;
         }
         $response = array('data' => $data ?? '');
@@ -427,7 +508,7 @@ if(isset($_POST['table'])){
 }
 
 if(isset($_POST['action'])){
-/** MAIN PAGE */
+/** MAIN PAGE */ 
     if($_POST['action'] == 'create_barangay_info'){
 
         $result = $conn->query("TRUNCATE TABLE brgy_info;");
@@ -476,20 +557,56 @@ if(isset($_POST['action'])){
                 'html' => 'Failed to truncate table, please try again later!',
                 'icon' => 'error',
             );
-        }
-        
+        }       
 
     }
+    if ($_POST['action'] == 'fetch_barangay_info') {
+        $sql = "SELECT * FROM brgy_info";
+        $row = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+        $response = array(
+            'header' => $row['header'] ?? '',
+            'name' => $row['name']  ?? '',
+            'title' => $row['title'] ?? '',
+            'content' => $row['content'] ?? '',
+            'footer' => $row['footer'] ?? '',
+        );
+    }
+    
 /** ANNOUNCEMENT */
     if($_POST['action'] == 'create_announcement'){
-        //get image file
-        $file = $_FILES['file']['tmp_name'];
-        $imageData = file_get_contents($file);
-        $base64 = base64_encode($imageData);
-        $imageType = $_FILES['file']['type']; // Get the image type
+        // Check if image file is actual file
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+            //get image file
+            $file = $_FILES['file']['tmp_name'];
+            $imageData = file_get_contents($file);
+            $base64 = base64_encode($imageData);
+            $imageType = $_FILES['file']['type']; // Get the image type
+            // Prepare the data URI
+            $dataUri = 'data:' . $imageType . ';base64,' . $base64;
 
-        // Prepare the data URI
-        $dataUri = 'data:' . $imageType . ';base64,' . $base64;
+            // Create an image resource from the binary data
+            $image = imagecreatefromstring($imageData);
+            // Resize the image
+            $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+            // Encode the resized image back to Base64
+            ob_start();
+
+            switch ($imageType) {
+                case 'image/png':
+                    imagepng($resizedImage);
+                    break;
+
+                default:
+                    imagejpeg($resizedImage);
+                    break;
+            }
+
+            $imageBase64 = base64_encode(ob_get_contents());
+            ob_end_clean();
+            $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+        } else {
+            $dataUri = '';
+        }
 
         $arr_data = array(
             'date_content'  => addslashes($_POST['date']),
@@ -525,7 +642,7 @@ if(isset($_POST['action'])){
     if($_POST['action'] == 'edit_announcement'){
         $id = $_POST['id'];
         // Check if image file is actual file
-        if( isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK ){
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
             //get image file
             $file = $_FILES['file']['tmp_name'];
             $imageData = file_get_contents($file);
@@ -533,37 +650,55 @@ if(isset($_POST['action'])){
             $imageType = $_FILES['file']['type']; // Get the image type
             // Prepare the data URI
             $dataUri = 'data:' . $imageType . ';base64,' . $base64;
-            
-            $date_content  = addslashes($_POST['date']);
-            $news_title    = addslashes($_POST['title']);
-            $content       = addslashes($_POST['content']);
-            $content_image = $dataUri;
-            $updated_by    = $_SESSION['id'];           
 
-            $sql = "UPDATE announcement SET
-                    date_content  = '$date_content',
-                    news_title    = '$news_title',
-                    content       = '$content',
-                    content_image = '$dataUri',
-                    updated_at    = '$updated_at',
-                    updated_by    = '$updated_by'
-                    WHERE id = $id
-                    ";
-        }else{
-            $date_content  = addslashes($_POST['date']);
-            $news_title    = addslashes($_POST['title']);
-            $content       = addslashes($_POST['content']);
-            $updated_by    = $_SESSION['id'];
+            // Create an image resource from the binary data
+            $image = imagecreatefromstring($imageData);
+            // Resize the image
+            $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+            // Encode the resized image back to Base64
+            ob_start();
 
-            $sql = "UPDATE announcement SET 
-                    date_content  = '$date_content', 
-                    news_title    = '$news_title', 
-                    content       = '$content', 
-                    updated_at    = '$updated_at', 
-                    updated_by    = '$updated_by'
-                    WHERE id = $id
-                    ";
+            switch ($imageType) {
+                case 'image/png':
+                    imagepng($resizedImage);
+                    break;
+
+                default:
+                    imagejpeg($resizedImage);
+                    break;
+            }
+
+            $imageBase64 = base64_encode(ob_get_contents());
+            ob_end_clean();
+            $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+
+            $arr_data = array(
+                'date_content'  => addslashes($_POST['date']),
+                'news_title'    => addslashes($_POST['title']),
+                'content'       => addslashes($_POST['content']),
+                'content_image' => $dataUri,
+                'updated_at'    => '',
+                'updated_by'    => $_SESSION['id']
+            );
+        } else {
+            $arr_data = array(
+                'date_content'  => addslashes($_POST['date']),
+                'news_title'    => addslashes($_POST['title']),
+                'content'       => addslashes($_POST['content']),
+                'updated_at'    => '',
+                'updated_by'    => $_SESSION['id']
+            );
         }
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE announcement SET " . $setValues . " WHERE id = $id";
 
         $result = $conn->query($sql);
         if (isset($result) == true) {
@@ -581,8 +716,6 @@ if(isset($_POST['action'])){
                 'icon' => 'error',
             );
         }
-
-        // $response = $sql;
     }
     if($_POST['action'] == 'delete_announcement'){
         $id = $_POST['id'];
@@ -1881,6 +2014,177 @@ if(isset($_POST['action'])){
             );
         }
     }
+/** INVENTORY */
+    if($_POST['action'] == 'create_inventory_item') {
+        // Check if image file is actual file
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+            //get image file
+            $file = $_FILES['file']['tmp_name'];
+            $imageData = file_get_contents($file);
+            $base64 = base64_encode($imageData);
+            $imageType = $_FILES['file']['type']; // Get the image type
+            // Prepare the data URI
+            $dataUri = 'data:' . $imageType . ';base64,' . $base64;
+
+            // Create an image resource from the binary data
+            $image = imagecreatefromstring($imageData);
+            // Resize the image
+            $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+            // Encode the resized image back to Base64
+            ob_start();
+
+            switch ($imageType) {
+                case 'image/png':
+                    imagepng($resizedImage);
+                    break;
+
+                default:
+                    imagejpeg($resizedImage);
+                    break;
+            }
+
+            $imageBase64 = base64_encode(ob_get_contents());
+            ob_end_clean();
+            $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+        } else {
+            $dataUri = '';
+        }
+
+        $arr_data = array(
+            'control_no'        => rand(1000, 9999) . date('y'),
+            'category'          => $_POST['category'],
+            'photo'             => $dataUri,
+            'item_name'         => $_POST['item_name'],
+            'details'           => '',
+            'descriptions'      => $_POST['desc'],
+            'quantity'          => $_POST['qty'],
+            'item_status'       => 1, // 0 = Unavailable, 1 = Available, 2 = Borrowed, 3 = Damaged, 4 = Lost
+        );
+
+        $columns = implode(",", array_keys($arr_data));
+        $values = implode("','", array_values($arr_data));
+
+        $sql = "INSERT INTO equipments ($columns) VALUES ('$values')";
+        $result = $conn->query($sql);
+        if (isset($result) == true) {
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Item has been added!',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'edit_inventory_item') {
+        $id = $_POST['id'];
+        // Check if image file is actual file
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+            //get image file
+            $file = $_FILES['file']['tmp_name'];
+            $imageData = file_get_contents($file);
+            $base64 = base64_encode($imageData);
+            $imageType = $_FILES['file']['type']; // Get the image type
+            // Prepare the data URI
+            $dataUri = 'data:' . $imageType . ';base64,' . $base64;
+
+            // Create an image resource from the binary data
+            $image = imagecreatefromstring($imageData);
+            // Resize the image
+            $resizedImage = imagescale($image, 200, 200); // Resize to 300x200 pixels
+            // Encode the resized image back to Base64
+            ob_start();
+            imagejpeg($resizedImage);
+            // imagepng($resizedImage);
+            $imageBase64 = base64_encode(ob_get_contents());
+            ob_end_clean();
+            $dataUri = 'data:' . $imageType . ';base64,' . $imageBase64;
+
+            $arr_data = array(
+                'category'          => $_POST['category'],
+                'photo'             => $dataUri,
+                'item_name'         => $_POST['item_name'],
+                'descriptions'      => $_POST['desc'],
+                'quantity'          => $_POST['qty'],
+                'item_status'       => $_POST['item_status'],
+                'updated_at'        => $updated_at,
+            );
+        } else {
+            $arr_data = array(
+                'category'          => $_POST['category'],
+                'item_name'         => $_POST['item_name'],
+                'descriptions'      => $_POST['desc'],
+                'item_status'       => $_POST['item_status'],
+                'quantity'          => $_POST['qty'],
+                'updated_at'        => $updated_at,
+            );
+        }
+
+        $cv = 0;
+        $setValues = '';
+        foreach ($arr_data as $index => $arr_data) {
+            $comma = ($cv > 0) ? ', ' : '';
+            $setValues .= $comma . $index . " = " . "'" . $arr_data . "'";
+            $cv++;
+        }
+
+        $sql = "UPDATE equipments SET " . $setValues . " WHERE id = $id";
+        $result = $conn->query($sql);
+        if(isset($result) == true){
+            $response = array(
+                'title' => 'Success!',
+                'html' => 'Item has been updated!',
+                'icon' => 'success',
+            );
+
+        }else{
+            $response = array(
+                'title' => 'Error!',
+                'html' => 'Please try again later!',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'delete_inventory_item') {
+        $id = $_POST['id'];
+        $sql = "DELETE from equipments WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result) {
+            $response = array(
+                'title' => 'Deleted!',
+                'html' => 'User Inventory item has been deleted.',
+                'icon' => 'success',
+            );
+        } else {
+            $response = array(
+                'title' => 'Failed!',
+                'html' => 'Failed to delete data.',
+                'icon' => 'error',
+            );
+        }
+    }
+    if($_POST['action'] == 'fetch_inventory_item') {
+        $tbl = 'equipments';
+        $id = $_POST['id'];
+        $sql = "SELECT * FROM $tbl WHERE id = $id";
+        $result = $conn->query($sql);
+        if ($result->rowCount() > 0) {
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            $response = array(
+                'id'            => $row['id'],
+                'category'      => $row['category'],
+                'item_name'     => $row['item_name'],
+                'desc'          => addslashes($row['descriptions']),
+                'qty'           => $row['quantity'],
+                'item_status'   => $row['item_status'],
+                'photo'         => $row['photo'],
+            );
+        }
+    }
 /** OFFICIALS */
     if ($_POST['action'] == 'create_official') {
 
@@ -2113,32 +2417,43 @@ if(isset($_POST['action'])){
     }
 /** USER ACCOUNTS */
     if ($_POST['action'] == 'create_account') {
-        $arr_data = array(
-            'email'             => addslashes($_POST['email']),
-            'pass'              => password_hash(addslashes($_POST['pass']), PASSWORD_BCRYPT),
-            'activation_code'   => '',
-            'is_active'         => 0,
-            'user_status'       => 'new registered',
-            'user_type'         => $_POST['user_type'],
-        );
 
-        $columns = implode(",", array_keys($arr_data));
-        $values = implode("','", array_values($arr_data));
-
-        $sql = "INSERT INTO users ($columns) VALUES ('$values')";
+        $sql = "SELECT * FROM users WHERE email = '" . $_POST['email'] . "'";
         $result = $conn->query($sql);
-        if (isset($result) == true) {
+        if ($result->rowCount() > 0) {
             $response = array(
-                'title' => 'Success!',
-                'html' => 'Account has been added!',
-                'icon' => 'success',
+                'title' => 'Failed!',
+                'html' => 'Email already exist!',
+                'icon' => 'warning',
             );
         } else {
-            $response = array(
-                'title' => 'Error!',
-                'html' => 'Please try again later!',
-                'icon' => 'error',
+            $arr_data = array(
+                'email'             => addslashes($_POST['email']),
+                'pass'              => password_hash(addslashes($_POST['pass']), PASSWORD_BCRYPT),
+                'activation_code'   => '',
+                'is_active'         => 0,
+                'user_status'       => 'new registered',
+                'user_type'         => $_POST['user_type'],
             );
+
+            $columns = implode(",", array_keys($arr_data));
+            $values = implode("','", array_values($arr_data));
+
+            $sql = "INSERT INTO users ($columns) VALUES ('$values')";
+            $result = $conn->query($sql);
+            if (isset($result) == true) {
+                $response = array(
+                    'title' => 'Success!',
+                    'html' => 'Account has been added!',
+                    'icon' => 'success',
+                );
+            } else {
+                $response = array(
+                    'title' => 'Error!',
+                    'html' => 'Please try again later!',
+                    'icon' => 'error',
+                );
+            }
         }
     }
     if ($_POST['action'] == 'edit_account') {
@@ -2696,6 +3011,9 @@ if(isset($_POST['fetch'])){
         }
         echo json_encode($response);
     }
+    if($_POST['fetch'] == 'inventory_list'){
+        $sql = "SELECT * FROM ";
+    }
 }
 
 //Generate OTP
@@ -2720,7 +3038,7 @@ function sendEmail($email, $subject, $message){
     $mail->Username   = "noreply@placer8portal.com";
     $mail->Password   = "noreply@placer8portal.com";
     $mail->From       = 'noreply@placer8portal.com';
-    $mail->FromName   = 'BMI-EIRS SYSTEM';
+    $mail->FromName   = 'Barangay 775 BMIS-EIRS';
 
     // RECIPIENTS
     $mail->addAddress($email);
@@ -2751,7 +3069,7 @@ function sendOTP($email, $subject){
     $mail->Username   = "noreply@placer8portal.com";
     $mail->Password   = "noreply@placer8portal.com";
     $mail->From       = 'noreply@placer8portal.com';
-    $mail->FromName   = 'BMI-EIRS SYSTEM';
+    $mail->FromName   = 'Barangay 775 BMIS-EIRS';
 
     $mail->addAddress($email);
     $mail->Subject    = $subject;

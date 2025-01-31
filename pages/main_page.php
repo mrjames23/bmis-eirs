@@ -80,11 +80,11 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
                     <div class="row mb-2">
                         <div class="col-sm-12">
                             <h1 class="card-title text-white">Barangay Information</h1>
-                            <?php if($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF'){?>
+                            <?php if ($user['user_type'] == 'ADMIN' || $user['user_type'] == 'STAFF') { ?>
                                 <button class="btn btn-primary btn-sm card-title float-right create" data-toggle="modal" data-target="#modal">
                                     <i class="fa fa-edit"></i> EDIT
                                 </button>
-                            <?php }?>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
                         <div class="text-center text-bold h4">
                             <?= $title ? strtoupper($title) : 'PUNONG BARANGAY'  ?>
                         </div>
-                        <p class="text-center text-bold mt-5 h4">
+                        <div class="text-center mt-5 text-white">
                             <?php
                             if ($content != '') {
                                 echo $content;
@@ -125,11 +125,11 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
                                 and the Tagalog word "bukid," meaning "farm" or "rice field." Barangay 775 is a subdivision within San Andres,
                                 with a population of 12,084 according to the 2020 census, representing approximately 0.65% of Manila's total population.
                             <?php } ?>
-                        </p>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col text-center">
-                            <img src="<?= $image?>" class=" p-2" alt="Image 1" style="width: 80px; height: 80px">
+                            <img src="<?= $image ?>" class=" p-2" alt="Image 1" style="width: 80px; height: 80px">
                             <a href="#" class="h4 text-white">
                                 <?= $footer ? $footer : 'Barangay 775 Zone 84 | Facebook'  ?>
                             </a>
@@ -144,7 +144,17 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
     <?php include_once('../includes/script.php') ?>
     <script>
         $(function() {
-            $('#form').submit(function(e) {
+            $('#content').summernote({
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['view', ['fullscreen', 'help']]
+                ],
+            });
+            $(document).on('submit', '#form', function(e) {
                 e.preventDefault();
                 $.ajax({
                     type: "POST",
@@ -192,10 +202,32 @@ $image = $mainpage['footer_logo'] ?? '../images/Facebook_Logo_(2019).png';
                         })
                     }
                 });
-            })
-
+            });
             $(document).on('click', '.create', function() {
-                $('#modal #action').val('create_barangay_info')
-            })
+                $.ajax({
+                    type: "post",
+                    url: "ajax",
+                    data: {
+                        action: 'fetch_barangay_info'
+                    },
+                    dataType: "json",
+                    beforeSend: function() {
+                        loading();
+                    },
+                    success: function(response) {
+                        Swal.close()
+                        $('#modal #action').val('create_barangay_info')
+                        $('#modal #header').val(response.header)
+                        $('#modal #name').val(response.name)
+                        $('#modal #title').val(response.title)
+                        $('#modal #content').summernote('code', response.content)
+                        $('#modal #footer').val(response.footer)
+                    },
+                    error: function() {
+                        error()
+                    }
+                });
+            });
+
         })
     </script>

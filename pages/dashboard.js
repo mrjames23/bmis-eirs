@@ -11,9 +11,12 @@ $(function () {
     var mode = 'index'
     var intersect = true
 
-    var $salesChart = $('#sales-chart')
+    //-------------
+    //- BAR CHART -
+    //-------------
+    var salesChart = $('#sales-chart')
     // eslint-disable-next-line no-unused-vars
-    var salesChart = new Chart($salesChart, {
+    var salesChart = new Chart(salesChart, {
         type: 'bar',
         data: {
             labels: ['JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
@@ -77,9 +80,12 @@ $(function () {
         }
     })
 
-    var $visitorsChart = $('#visitors-chart')
+    //-------------
+    //- LINE CHART -
+    //-------------
+    var visitorsChart = $('#visitors-chart')
     // eslint-disable-next-line no-unused-vars
-    var visitorsChart = new Chart($visitorsChart, {
+    var visitorsChart = new Chart(visitorsChart, {
         data: {
             labels: ['JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
             datasets: [{
@@ -152,6 +158,36 @@ $(function () {
                 }]
             }
         }
+    })
+
+    //-------------
+    //- PIE CHART -
+    //-------------
+    // Get context with jQuery - using jQuery's .get() method.    
+    var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
+    var pieData = {
+        labels: [
+            'VEHICLES',
+            'EQUIPMENTS',
+            'VENUES',
+        ],
+        datasets: [
+            {
+                data: [700, 500, 400],
+                backgroundColor: ['#17a2b8', '#00a65a', '#ffc107'],
+            }
+        ]
+    }
+    var pieOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+    }
+    //Create pie or douhnut chart
+    // You can switch between pie and douhnut using the method below.
+    new Chart(pieChartCanvas, {
+        type: 'pie',
+        data: pieData,
+        options: pieOptions
     })
 })
 

@@ -12,9 +12,19 @@ include_once('session.php');
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
+                    <div class="row mb-1">
                         <div class="col-sm-6">
                             <h1 class="m-0">Dashboard</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="breadcrumb float-sm-right">
+                                <select class="custom-select" name="" id="">
+                                    <option selected>Latest report summary (2025)</option>
+                                    <option value="">Year 2024 report summary</option>
+                                    <option value="">Year 2023 report summary</option>
+                                    <option value="">Year 2022 report summary</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -38,7 +48,7 @@ include_once('session.php');
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>500</h3>
+                                    <h3>202</h3>
                                     <p>EQUIPMENTS</p>
                                 </div>
                                 <div class="icon">
@@ -72,8 +82,9 @@ include_once('session.php');
                             </div>
                         </div>
                     </div>
+                    <!-- Graphs Report-->
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-7">
                             <!-- Bar Graph -->
                             <div class="card">
                                 <div class="card-header border-0">
@@ -92,7 +103,7 @@ include_once('session.php');
                                             <span class="text-success">
                                                 <i class="fas fa-arrow-up"></i> 33.1%
                                             </span>
-                                            <span class="text-muted">Since last month</span>
+                                            <span class="text-muted">Since last year</span>
                                         </p>
                                     </div>
                                     <div class="position-relative mb-4">
@@ -110,113 +121,6 @@ include_once('session.php');
                                     </div>
                                 </div>
                             </div>
-                            <!-- List -->
-                            <div class="card">
-                                <div class="card-header border-0">
-                                    <h3 class="card-title">Inventory</h3>
-                                    <div class="card-tools">
-                                        <a href="#" class="btn btn-tool btn-sm">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-tool btn-sm">
-                                            <i class="fas fa-bars"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="card-body table-responsive p-0">
-                                    <table class="table table-striped table-valign-middle">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Details</th>
-                                                <th>Count</th>
-                                                <th>More</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <img src="dist/img/default-150x150.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                                    Some Product
-                                                </td>
-                                                <td>$13 USD</td>
-                                                <td>
-                                                    <small class="text-success mr-1">
-                                                        <i class="fas fa-arrow-up"></i>
-                                                        12%
-                                                    </small>
-                                                    12,000 Sold
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="text-muted">
-                                                        <i class="fas fa-search"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <img src="dist/img/default-150x150.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                                    Another Product
-                                                </td>
-                                                <td>$29 USD</td>
-                                                <td>
-                                                    <small class="text-warning mr-1">
-                                                        <i class="fas fa-arrow-down"></i>
-                                                        0.5%
-                                                    </small>
-                                                    123,234 Sold
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="text-muted">
-                                                        <i class="fas fa-search"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <img src="dist/img/default-150x150.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                                    Amazing Product
-                                                </td>
-                                                <td>$1,230 USD</td>
-                                                <td>
-                                                    <small class="text-danger mr-1">
-                                                        <i class="fas fa-arrow-down"></i>
-                                                        3%
-                                                    </small>
-                                                    198 Sold
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="text-muted">
-                                                        <i class="fas fa-search"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <img src="dist/img/default-150x150.png" alt="Product 1" class="img-circle img-size-32 mr-2">
-                                                    Perfect Item
-                                                    <span class="badge bg-danger">NEW</span>
-                                                </td>
-                                                <td>$199 USD</td>
-                                                <td>
-                                                    <small class="text-success mr-1">
-                                                        <i class="fas fa-arrow-up"></i>
-                                                        63%
-                                                    </small>
-                                                    87 Sold
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="text-muted">
-                                                        <i class="fas fa-search"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
                             <!-- Line Graph -->
                             <div class="card">
                                 <div class="card-header border-0">
@@ -229,13 +133,7 @@ include_once('session.php');
                                     <div class="d-flex">
                                         <p class="d-flex flex-column">
                                             <span class="text-bold text-lg">820</span>
-                                            <span>Rate Per Item</span>
-                                        </p>
-                                        <p class="ml-auto d-flex flex-column text-right">
-                                            <span class="text-success">
-                                                <i class="fas fa-arrow-up"></i> 12.5%
-                                            </span>
-                                            <span class="text-muted">Since last week</span>
+                                            <span>Rate Per Category Item</span>
                                         </p>
                                     </div>
                                     <div class="position-relative mb-4">
@@ -255,22 +153,61 @@ include_once('session.php');
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <!-- PIE CHART -->
+                            <div class="card">
+                                <div class="card-header border-0 mt-1">
+                                    <h3 class="card-title">Most Borrowed Category</h3>
+                                    <div class="card-tools">
+                                        <div class="btn btn-tool">
+                                            <select class="custom-select" name="" id="">
+                                                <option selected>Select Month</option>
+                                                <option value="">January</option>
+                                                <option value="">February</option>
+                                                <option value="">March</option>
+                                                <option value="">April</option>
+                                                <option value="">May</option>
+                                                <option value="">June</option>
+                                                <option value="">July</option>
+                                                <option value="">August</option>
+                                                <option value="">September</option>
+                                                <option value="">November</option>
+                                                <option value="">December</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
                             <!-- Rate Overview -->
                             <div class="card">
-                                <div class="card-header border-0">
+                                <div class="card-header border-0 mt-1">
                                     <h3 class="card-title">Reservations Overview</h3>
                                     <div class="card-tools">
-                                        <a href="#" class="btn btn-sm btn-tool">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-sm btn-tool">
-                                            <i class="fas fa-bars"></i>
-                                        </a>
+                                        <div class="btn btn-tool">
+                                            <select class="custom-select" name="" id="">
+                                                <option selected>Select Month</option>
+                                                <option value="">January</option>
+                                                <option value="">February</option>
+                                                <option value="">March</option>
+                                                <option value="">April</option>
+                                                <option value="">May</option>
+                                                <option value="">June</option>
+                                                <option value="">July</option>
+                                                <option value="">August</option>
+                                                <option value="">September</option>
+                                                <option value="">November</option>
+                                                <option value="">December</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center border-bottom mb-3">
-                                        <p class="text-success text-xl">
+                                        <p class="text-info text-xl">
                                             <i class="fas fa-ambulance"></i>
                                         </p>
                                         <p class="d-flex flex-column text-right">
@@ -281,7 +218,7 @@ include_once('session.php');
                                         </p>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center border-bottom mb-3">
-                                        <p class="text-warning text-xl">
+                                        <p class="text-success text-xl">
                                             <i class="fas fa-tools"></i>
                                         </p>
                                         <p class="d-flex flex-column text-right">
@@ -292,7 +229,7 @@ include_once('session.php');
                                         </p>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mb-0">
-                                        <p class="text-danger text-xl">
+                                        <p class="text-warning text-xl">
                                             <i class="fas fa-warehouse"></i>
                                         </p>
                                         <p class="d-flex flex-column text-right">
@@ -302,6 +239,58 @@ include_once('session.php');
                                             <span class="text-muted">VENUE RATE</span>
                                         </p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Inventory List -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header border-0">
+                                    <h3 class="card-title">Inventory Summary</h3>
+                                    <div class="card-tools"></div>
+                                </div>
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-striped table-valign-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Inventory Items or Descriptions</th>
+                                                <th>Quantity</th>
+                                                <th>More</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Vehicles</td>
+                                                <td>Ambulance, Rescue Vehicle, Tricycle</td>
+                                                <td>3</td>
+                                                <td><a href="#" class="text-muted"><i class="fas fa-search"></i></a></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Equipments</td>
+                                                <td>Ladder, Tolda, Chairs, Tables, Projector, Kariton</td>
+                                                <td>202</td>
+                                                <td>
+                                                    <a href="#" class="text-muted">
+                                                        <i class="fas fa-search"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Venues</td>
+                                                <td>Barangay Hall, Barangay Basketball Court, Amadome</td>
+                                                <td>3</td>
+                                                <td>
+                                                    <a href="#" class="text-muted">
+                                                        <i class="fas fa-search"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

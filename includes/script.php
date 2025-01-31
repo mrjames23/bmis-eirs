@@ -44,7 +44,25 @@
             showConfirmButton: false,
             timer: 2000
         });
+        window.alert_toast = function($msg = 'TEST', $bg = 'success', $pos = '') {
+            var Toast = Swal.mixin({
+                toast: true,
+                position: $pos || 'top',
+                showConfirmButton: false,
+                timer: 5000
+            });
+            Toast.fire({
+                icon: $bg,
+                title: $msg
+            })
+        };
         $(function() {
+            // Initialize Summernote
+            $('#summernote').summernote({
+                toolbar: [],
+            })
+            var $summernotes = $('[data-control="summernote-container"]');
+            $summernotes.find('.note-toolbar').hide();
             // Initialize the bootstrap switch
             $("input[data-bootstrap-switch]").each(function() {
                 $(this).bootstrapSwitch('state', $(this).prop('checked'));
